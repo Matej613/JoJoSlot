@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>JoJo Slots: Forever Edition</title>
+    <title>JoJo Slots: Permanent Stand</title>
     <style>
         :root {
             --jojo-purple: #4b0082;
@@ -28,6 +28,7 @@
             text-shadow: 4px 4px var(--jojo-purple), -2px -2px var(--jojo-pink);
             font-size: 3.5rem;
             margin: 20px 0;
+            text-align: center;
         }
 
         .machine-frame {
@@ -107,13 +108,13 @@
     </div>
 
     <div class="controls">
-        <h2 id="status">STAND BY...</h2>
+        <h2 id="status">INITIALIZING...</h2>
         <button id="spin-btn">SPIN!</button>
     </div>
 
     <div class="admin-section">
         <h3>1. Roster & 2. Payouts</h3>
-        <p style="font-size: 0.8rem; color: var(--jojo-gold);">Changes are saved automatically to your browser!</p>
+        <p style="color: var(--jojo-gold); font-size: 0.9rem;">Automatic saving enabled.</p>
         
         <table id="symbol-table">
             <thead><tr><th>Icon</th><th>ID</th><th>Upload</th><th>Weight</th><th>Action</th></tr></thead>
@@ -128,52 +129,70 @@
             <tbody id="payout-body"></tbody>
         </table>
         <button class="add-btn" onclick="addPayout()">+ Add Rule</button>
-        <button class="reset-btn" onclick="clearAllData()">⚠️ Reset All Data</button>
+        <button class="reset-btn" onclick="clearAllData()">⚠️ Factory Reset</button>
     </div>
 
 <script>
-    // Initial Defaults
-    let symbols = [
+    // --- DATABASE ---
+    let symbols = [];
+    let payouts = [];
+
+    const defaultSymbols = [
         { id: "Jotaro", url: "https://via.placeholder.com/140/4b0082/ffffff?text=JOTARO", weight: 10 },
         { id: "DIO", url: "https://via.placeholder.com/140/ffd700/000000?text=DIO", weight: 5 }
     ];
 
-    let payouts = [
+    const defaultPayouts = [
         { symId: "DIO", count: 3, message: "ZA WARUDO!" }
     ];
 
-    const strips = [document.getElementById('strip1'), document.getElementById('strip2'), document.getElementById('strip3')];
-
-    // --- SAVE / LOAD LOGIC ---
+    // --- SAVE / LOAD ---
 
     function saveData() {
-        // We can't save the actual uploaded file easily, but we save the "DataURL" (the image content)
-        localStorage.setItem('jojo_symbols', JSON.stringify(symbols));
-        localStorage.setItem('jojo_payouts', JSON.stringify(payouts));
+        try {
+            localStorage.setItem('jojo_slots_symbols', JSON.stringify(symbols));
+            localStorage.setItem('jojo_slots_payouts', JSON.stringify(payouts));
+            console.log("Data saved to local storage.");
+        } catch (e) {
+            alert("Storage full! Try using smaller images.");
+        }
     }
 
     function loadData() {
-        const savedSymbols = localStorage.getItem('jojo_symbols');
-        const savedPayouts = localStorage.getItem('jojo_payouts');
-        if (savedSymbols) symbols = JSON.parse(savedSymbols);
-        if (savedPayouts) payouts = JSON.parse(savedPayouts);
+        const savedS = localStorage.getItem('jojo_slots_symbols');
+        const savedP = localStorage.getItem('jojo_slots_payouts');
+
+        // Only use defaults if there is NO saved data at all
+        if (savedS && savedS !== "[]") {
+            symbols = JSON.parse(savedS);
+        } else {
+            symbols = [...defaultSymbols];
+        }
+
+        if (savedP && savedP !== "[]") {
+            payouts = JSON.parse(savedP);
+        } else {
+            payouts = [...defaultPayouts];
+        }
+        
         renderAll();
     }
 
     function clearAllData() {
-        if(confirm("Delete everything and reset?")) {
-            localStorage.clear();
+        if(confirm("This will delete all your custom images and rules. Proceed?")) {
+            localStorage.removeItem('jojo_slots_symbols');
+            localStorage.removeItem('jojo_slots_payouts');
             location.reload();
         }
     }
 
-    // --- SYSTEM LOGIC ---
+    // --- UI RENDERING ---
 
     function renderAll() {
         renderSymbols();
         renderPayouts();
         initStrips();
-        document.getElementById('status').innerText = "DATA LOADED";
+        document.getElementById('status').innerText = "STAND READY";
     }
 
     function renderSymbols() {
@@ -218,7 +237,7 @@
         if (file) {
             const reader = new FileReader();
             reader.onload = function(e) {
-                symbols[index].url = e.target.result; // This converts image to text so it can be saved!
+                symbols[index].url = e.target.result;
                 saveData();
                 renderAll();
             };
@@ -226,12 +245,17 @@
         }
     }
 
-    function addSymbol() { symbols.push({ id: "New"+symbols.length, url: "https://via.placeholder.com/140?text=?", weight: 10 }); renderAll(); saveData(); }
-    function removeSymbol(i) { if(symbols.length > 1) { symbols.splice(i, 1); renderAll(); saveData(); } }
     function updateSym(i, key, val) { symbols[i][key] = val; renderPayouts(); saveData(); }
-    function addPayout() { payouts.push({ symId: symbols[0].id, count: 1, message: "Win!" }); renderPayouts(); saveData(); }
+    function addSymbol() { symbols.push({ id: "New"+symbols.length, url: "https://via.placeholder.com/140", weight: 10 }); renderAll(); saveData(); }
+    function removeSymbol(i) { if(symbols.length > 1) { symbols.splice(i, 1); renderAll(); saveData(); } }
+    
     function updatePayout(i, key, val) { payouts[i][key] = val; saveData(); }
+    function addPayout() { payouts.push({ symId: symbols[0].id, count: 1, message: "Win!" }); renderPayouts(); saveData(); }
     function removePayout(i) { payouts.splice(i, 1); renderPayouts(); saveData(); }
+
+    // --- ANIMATION ---
+
+    const strips = [document.getElementById('strip1'), document.getElementById('strip2'), document.getElementById('strip3')];
 
     function initStrips() {
         strips.forEach(strip => {
@@ -267,7 +291,10 @@
                 strip.style.transition = `top ${1.5 + (i * 0.5)}s cubic-bezier(0.1, 0, 0.1, 1)`;
                 strip.style.top = `${finalPosition}px`;
             });
-            setTimeout(() => { checkWinner(results); btn.disabled = false; }, 3000);
+            setTimeout(() => { 
+                checkWinner(results); 
+                btn.disabled = false; 
+            }, 3000);
         }, 50);
     });
 
@@ -279,7 +306,7 @@
         document.getElementById('status').innerText = winRule ? winRule.message : "YARE YARE DAZE...";
     }
 
-    // Run on startup
+    // START
     loadData();
 </script>
 </body>
