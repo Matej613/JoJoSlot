@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>JoJo Slots: Count Edition</title>
+    <title>JoJo Slots: Forever Edition</title>
     <style>
         :root {
             --jojo-purple: #4b0082;
@@ -89,7 +89,8 @@
         input, select { background: #111; color: white; border: 1px solid var(--jojo-gold); padding: 5px; }
         
         .remove-btn { color: #ff4d4d; cursor: pointer; font-weight: bold; }
-        .add-btn { background: var(--jojo-gold); color: black; border: none; padding: 10px 20px; cursor: pointer; border-radius: 5px; font-weight: bold; }
+        .add-btn { background: var(--jojo-gold); color: black; border: none; padding: 10px 20px; cursor: pointer; border-radius: 5px; font-weight: bold; margin-right: 10px;}
+        .reset-btn { background: #ff4d4d; color: white; border: none; padding: 10px 20px; cursor: pointer; border-radius: 5px; }
         .preview-thumb { width: 35px; height: 35px; object-fit: cover; border-radius: 4px; }
     </style>
 </head>
@@ -106,57 +107,73 @@
     </div>
 
     <div class="controls">
-        <h2 id="status">READY?</h2>
+        <h2 id="status">STAND BY...</h2>
         <button id="spin-btn">SPIN!</button>
     </div>
 
     <div class="admin-section">
-        <h3>1. Roster</h3>
+        <h3>1. Roster & 2. Payouts</h3>
+        <p style="font-size: 0.8rem; color: var(--jojo-gold);">Changes are saved automatically to your browser!</p>
+        
         <table id="symbol-table">
-            <thead>
-                <tr><th>Icon</th><th>ID</th><th>Upload</th><th>Weight</th><th>Action</th></tr>
-            </thead>
+            <thead><tr><th>Icon</th><th>ID</th><th>Upload</th><th>Weight</th><th>Action</th></tr></thead>
             <tbody id="symbol-body"></tbody>
         </table>
         <button class="add-btn" onclick="addSymbol()">+ Add Character</button>
-    </div>
 
-    <div class="admin-section">
-        <h3>2. Payout Table (Count-Based)</h3>
-        <p style="font-size: 0.8rem; color: #aaa;">Example: If you set [DIO] and [2], you win if 2 DIOs appear anywhere.</p>
+        <hr style="border: 0.5px solid #444; margin: 20px 0;">
+
         <table id="payout-table">
-            <thead>
-                <tr>
-                    <th>If I hit...</th>
-                    <th>This many times...</th>
-                    <th>Show Message</th>
-                    <th>Action</th>
-                </tr>
-            </thead>
+            <thead><tr><th>If hit...</th><th>Count</th><th>Message</th><th>Action</th></tr></thead>
             <tbody id="payout-body"></tbody>
         </table>
         <button class="add-btn" onclick="addPayout()">+ Add Rule</button>
+        <button class="reset-btn" onclick="clearAllData()">⚠️ Reset All Data</button>
     </div>
 
 <script>
+    // Initial Defaults
     let symbols = [
         { id: "Jotaro", url: "https://via.placeholder.com/140/4b0082/ffffff?text=JOTARO", weight: 10 },
         { id: "DIO", url: "https://via.placeholder.com/140/ffd700/000000?text=DIO", weight: 5 }
     ];
 
     let payouts = [
-        { symId: "DIO", count: 3, message: "MUDA MUDA MUDA!" },
-        { symId: "DIO", count: 1, message: "DIO is near..." },
-        { symId: "Jotaro", count: 2, message: "Two Jotaros! ORA!" }
+        { symId: "DIO", count: 3, message: "ZA WARUDO!" }
     ];
 
-    const spinBtn = document.getElementById('spin-btn');
     const strips = [document.getElementById('strip1'), document.getElementById('strip2'), document.getElementById('strip3')];
+
+    // --- SAVE / LOAD LOGIC ---
+
+    function saveData() {
+        // We can't save the actual uploaded file easily, but we save the "DataURL" (the image content)
+        localStorage.setItem('jojo_symbols', JSON.stringify(symbols));
+        localStorage.setItem('jojo_payouts', JSON.stringify(payouts));
+    }
+
+    function loadData() {
+        const savedSymbols = localStorage.getItem('jojo_symbols');
+        const savedPayouts = localStorage.getItem('jojo_payouts');
+        if (savedSymbols) symbols = JSON.parse(savedSymbols);
+        if (savedPayouts) payouts = JSON.parse(savedPayouts);
+        renderAll();
+    }
+
+    function clearAllData() {
+        if(confirm("Delete everything and reset?")) {
+            localStorage.clear();
+            location.reload();
+        }
+    }
+
+    // --- SYSTEM LOGIC ---
 
     function renderAll() {
         renderSymbols();
         renderPayouts();
         initStrips();
+        document.getElementById('status').innerText = "DATA LOADED";
     }
 
     function renderSymbols() {
@@ -179,13 +196,11 @@
         payouts.forEach((p, i) => {
             body.innerHTML += `<tr>
                 <td>${createDropdown(i, p.symId)}</td>
-                <td>
-                    <select onchange="updatePayout(${i}, 'count', parseInt(this.value))">
-                        <option value="1" ${p.count===1?'selected':''}>1 Time</option>
-                        <option value="2" ${p.count===2?'selected':''}>2 Times</option>
-                        <option value="3" ${p.count===3?'selected':''}>3 Times</option>
-                    </select>
-                </td>
+                <td><select onchange="updatePayout(${i}, 'count', parseInt(this.value))">
+                    <option value="1" ${p.count===1?'selected':''}>1x</option>
+                    <option value="2" ${p.count===2?'selected':''}>2x</option>
+                    <option value="3" ${p.count===3?'selected':''}>3x</option>
+                </select></td>
                 <td><input type="text" value="${p.message}" onchange="updatePayout(${i}, 'message', this.value)" style="width:90%"></td>
                 <td><span class="remove-btn" onclick="removePayout(${i})">✖</span></td>
             </tr>`;
@@ -194,29 +209,35 @@
 
     function createDropdown(pIndex, currentVal) {
         let html = `<select onchange="updatePayout(${pIndex}, 'symId', this.value)">`;
-        symbols.forEach(s => {
-            html += `<option value="${s.id}" ${s.id === currentVal ? 'selected' : ''}>${s.id}</option>`;
-        });
+        symbols.forEach(s => { html += `<option value="${s.id}" ${s.id === currentVal ? 'selected' : ''}>${s.id}</option>`; });
         return html + `</select>`;
     }
 
     function handleFileUpload(event, index) {
         const file = event.target.files[0];
-        if (file) { symbols[index].url = URL.createObjectURL(file); renderAll(); }
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                symbols[index].url = e.target.result; // This converts image to text so it can be saved!
+                saveData();
+                renderAll();
+            };
+            reader.readAsDataURL(file);
+        }
     }
 
-    function addSymbol() { symbols.push({ id: "New"+symbols.length, url: "https://via.placeholder.com/140?text=?", weight: 10 }); renderAll(); }
-    function removeSymbol(i) { if(symbols.length > 1) { symbols.splice(i, 1); renderAll(); } }
-    function updateSym(i, key, val) { symbols[i][key] = val; renderPayouts(); }
-    function addPayout() { payouts.push({ symId: symbols[0].id, count: 1, message: "Nice!" }); renderPayouts(); }
-    function updatePayout(i, key, val) { payouts[i][key] = val; }
-    function removePayout(i) { payouts.splice(i, 1); renderPayouts(); }
+    function addSymbol() { symbols.push({ id: "New"+symbols.length, url: "https://via.placeholder.com/140?text=?", weight: 10 }); renderAll(); saveData(); }
+    function removeSymbol(i) { if(symbols.length > 1) { symbols.splice(i, 1); renderAll(); saveData(); } }
+    function updateSym(i, key, val) { symbols[i][key] = val; renderPayouts(); saveData(); }
+    function addPayout() { payouts.push({ symId: symbols[0].id, count: 1, message: "Win!" }); renderPayouts(); saveData(); }
+    function updatePayout(i, key, val) { payouts[i][key] = val; saveData(); }
+    function removePayout(i) { payouts.splice(i, 1); renderPayouts(); saveData(); }
 
     function initStrips() {
         strips.forEach(strip => {
             strip.innerHTML = '';
             const list = [];
-            for(let i=0; i<30; i++) { list.push(...symbols); }
+            for(let i=0; i<20; i++) { list.push(...symbols); }
             list.forEach(s => {
                 const img = document.createElement('img');
                 img.src = s.url;
@@ -232,8 +253,9 @@
         for (let s of symbols) { if (r < s.weight) return s; r -= s.weight; }
     }
 
-    spinBtn.addEventListener('click', () => {
-        spinBtn.disabled = true;
+    document.getElementById('spin-btn').addEventListener('click', () => {
+        const btn = document.getElementById('spin-btn');
+        btn.disabled = true;
         document.getElementById('status').innerText = "MUDA MUDA MUDA!";
         strips.forEach(s => { s.style.transition = 'none'; s.style.top = '0px'; });
 
@@ -241,31 +263,24 @@
             const results = [weightedRandom(), weightedRandom(), weightedRandom()];
             strips.forEach((strip, i) => {
                 const symbolIndex = symbols.findIndex(s => s.id === results[i].id);
-                const finalPosition = -((15 * symbols.length * 140) + (symbolIndex * 140));
-                strip.style.transition = `top ${2 + (i * 0.7)}s cubic-bezier(0.1, 0, 0.1, 1)`;
+                const finalPosition = -((10 * symbols.length * 140) + (symbolIndex * 140));
+                strip.style.transition = `top ${1.5 + (i * 0.5)}s cubic-bezier(0.1, 0, 0.1, 1)`;
                 strip.style.top = `${finalPosition}px`;
             });
-            setTimeout(() => { checkWinner(results); spinBtn.disabled = false; }, 3500);
+            setTimeout(() => { checkWinner(results); btn.disabled = false; }, 3000);
         }, 50);
     });
 
     function checkWinner(results) {
         const counts = {};
         results.forEach(r => { counts[r.id] = (counts[r.id] || 0) + 1; });
-
-        // Sort payouts so that rules requiring 3 matches are checked before rules requiring 1
         const sortedPayouts = [...payouts].sort((a, b) => b.count - a.count);
-        
         const winRule = sortedPayouts.find(p => counts[p.symId] >= p.count);
-
-        if (winRule) {
-            document.getElementById('status').innerText = winRule.message;
-        } else {
-            document.getElementById('status').innerText = "YARE YARE DAZE...";
-        }
+        document.getElementById('status').innerText = winRule ? winRule.message : "YARE YARE DAZE...";
     }
 
-    renderAll();
+    // Run on startup
+    loadData();
 </script>
 </body>
 </html>
