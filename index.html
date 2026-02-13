@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JoJo Slots: Count Edition</title>
+    <style>
+        :root {
+            --jojo-purple: #4b0082;
+            --jojo-pink: #ff00ff;
+            --jojo-gold: #ffd700;
+        }
+
+        body {
+            background-color: #0d0d0d;
+            color: white;
+            font-family: 'Segoe UI', Impact, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding-bottom: 50px;
+        }
+
+        h1 {
+            color: var(--jojo-gold);
+            text-shadow: 4px 4px var(--jojo-purple), -2px -2px var(--jojo-pink);
+            font-size: 3.5rem;
+            margin: 20px 0;
+        }
+
+        .machine-frame {
+            background: #1a1a1a;
+            padding: 30px;
+            border: 10px double var(--jojo-gold);
+            border-radius: 20px;
+            box-shadow: 0 0 40px var(--jojo-purple);
+        }
+
+        .reels-container {
+            display: flex;
+            gap: 15px;
+            background: #222;
+            padding: 10px;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 4px solid #000;
+        }
+
+        .reel {
+            width: 140px;
+            height: 140px;
+            background: white;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .reel-strip { position: absolute; top: 0; left: 0; width: 100%; }
+        .reel-strip img { width: 140px; height: 140px; display: block; object-fit: cover; }
+
+        .controls { margin-top: 25px; text-align: center; }
+        #status { height: 1.5em; color: var(--jojo-pink); text-shadow: 2px 2px #000; font-size: 1.8rem; }
+
+        #spin-btn {
+            background: linear-gradient(to bottom, var(--jojo-pink), var(--jojo-purple));
+            color: white;
+            padding: 15px 60px;
+            font-size: 2rem;
+            font-weight: bold;
+            border: 3px solid var(--jojo-gold);
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 5px 15px rgba(255, 0, 255, 0.4);
+        }
+
+        .admin-section {
+            margin-top: 40px;
+            background: #222;
+            padding: 20px;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 900px;
+            border: 1px solid var(--jojo-purple);
+        }
+
+        table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
+        th, td { padding: 10px; text-align: left; border-bottom: 1px solid #444; }
+        input, select { background: #111; color: white; border: 1px solid var(--jojo-gold); padding: 5px; }
+        
+        .remove-btn { color: #ff4d4d; cursor: pointer; font-weight: bold; }
+        .add-btn { background: var(--jojo-gold); color: black; border: none; padding: 10px 20px; cursor: pointer; border-radius: 5px; font-weight: bold; }
+        .preview-thumb { width: 35px; height: 35px; object-fit: cover; border-radius: 4px; }
+    </style>
+</head>
+<body>
+
+    <h1>STARDUST SLOTS</h1>
+    
+    <div class="machine-frame">
+        <div class="reels-container">
+            <div class="reel"><div id="strip1" class="reel-strip"></div></div>
+            <div class="reel"><div id="strip2" class="reel-strip"></div></div>
+            <div class="reel"><div id="strip3" class="reel-strip"></div></div>
+        </div>
+    </div>
+
+    <div class="controls">
+        <h2 id="status">READY?</h2>
+        <button id="spin-btn">SPIN!</button>
+    </div>
+
+    <div class="admin-section">
+        <h3>1. Roster</h3>
+        <table id="symbol-table">
+            <thead>
+                <tr><th>Icon</th><th>ID</th><th>Upload</th><th>Weight</th><th>Action</th></tr>
+            </thead>
+            <tbody id="symbol-body"></tbody>
+        </table>
+        <button class="add-btn" onclick="addSymbol()">+ Add Character</button>
+    </div>
+
+    <div class="admin-section">
+        <h3>2. Payout Table (Count-Based)</h3>
+        <p style="font-size: 0.8rem; color: #aaa;">Example: If you set [DIO] and [2], you win if 2 DIOs appear anywhere.</p>
+        <table id="payout-table">
+            <thead>
+                <tr>
+                    <th>If I hit...</th>
+                    <th>This many times...</th>
+                    <th>Show Message</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody id="payout-body"></tbody>
+        </table>
+        <button class="add-btn" onclick="addPayout()">+ Add Rule</button>
+    </div>
+
+<script>
+    let symbols = [
+        { id: "Jotaro", url: "https://via.placeholder.com/140/4b0082/ffffff?text=JOTARO", weight: 10 },
+        { id: "DIO", url: "https://via.placeholder.com/140/ffd700/000000?text=DIO", weight: 5 }
+    ];
+
+    let payouts = [
+        { symId: "DIO", count: 3, message: "MUDA MUDA MUDA!" },
+        { symId: "DIO", count: 1, message: "DIO is near..." },
+        { symId: "Jotaro", count: 2, message: "Two Jotaros! ORA!" }
+    ];
+
+    const spinBtn = document.getElementById('spin-btn');
+    const strips = [document.getElementById('strip1'), document.getElementById('strip2'), document.getElementById('strip3')];
+
+    function renderAll() {
+        renderSymbols();
+        renderPayouts();
+        initStrips();
+    }
+
+    function renderSymbols() {
+        const body = document.getElementById('symbol-body');
+        body.innerHTML = '';
+        symbols.forEach((s, i) => {
+            body.innerHTML += `<tr>
+                <td><img src="${s.url}" class="preview-thumb"></td>
+                <td><input type="text" value="${s.id}" onchange="updateSym(${i}, 'id', this.value)"></td>
+                <td><input type="file" accept="image/*" onchange="handleFileUpload(event, ${i})"></td>
+                <td><input type="number" value="${s.weight}" onchange="updateSym(${i}, 'weight', parseInt(this.value))" style="width:50px"></td>
+                <td><span class="remove-btn" onclick="removeSymbol(${i})">✖</span></td>
+            </tr>`;
+        });
+    }
+
+    function renderPayouts() {
+        const body = document.getElementById('payout-body');
+        body.innerHTML = '';
+        payouts.forEach((p, i) => {
+            body.innerHTML += `<tr>
+                <td>${createDropdown(i, p.symId)}</td>
+                <td>
+                    <select onchange="updatePayout(${i}, 'count', parseInt(this.value))">
+                        <option value="1" ${p.count===1?'selected':''}>1 Time</option>
+                        <option value="2" ${p.count===2?'selected':''}>2 Times</option>
+                        <option value="3" ${p.count===3?'selected':''}>3 Times</option>
+                    </select>
+                </td>
+                <td><input type="text" value="${p.message}" onchange="updatePayout(${i}, 'message', this.value)" style="width:90%"></td>
+                <td><span class="remove-btn" onclick="removePayout(${i})">✖</span></td>
+            </tr>`;
+        });
+    }
+
+    function createDropdown(pIndex, currentVal) {
+        let html = `<select onchange="updatePayout(${pIndex}, 'symId', this.value)">`;
+        symbols.forEach(s => {
+            html += `<option value="${s.id}" ${s.id === currentVal ? 'selected' : ''}>${s.id}</option>`;
+        });
+        return html + `</select>`;
+    }
+
+    function handleFileUpload(event, index) {
+        const file = event.target.files[0];
+        if (file) { symbols[index].url = URL.createObjectURL(file); renderAll(); }
+    }
+
+    function addSymbol() { symbols.push({ id: "New"+symbols.length, url: "https://via.placeholder.com/140?text=?", weight: 10 }); renderAll(); }
+    function removeSymbol(i) { if(symbols.length > 1) { symbols.splice(i, 1); renderAll(); } }
+    function updateSym(i, key, val) { symbols[i][key] = val; renderPayouts(); }
+    function addPayout() { payouts.push({ symId: symbols[0].id, count: 1, message: "Nice!" }); renderPayouts(); }
+    function updatePayout(i, key, val) { payouts[i][key] = val; }
+    function removePayout(i) { payouts.splice(i, 1); renderPayouts(); }
+
+    function initStrips() {
+        strips.forEach(strip => {
+            strip.innerHTML = '';
+            const list = [];
+            for(let i=0; i<30; i++) { list.push(...symbols); }
+            list.forEach(s => {
+                const img = document.createElement('img');
+                img.src = s.url;
+                strip.appendChild(img);
+            });
+            strip.style.transition = 'none'; strip.style.top = '0px';
+        });
+    }
+
+    function weightedRandom() {
+        let total = symbols.reduce((s, item) => s + (item.weight || 1), 0);
+        let r = Math.random() * total;
+        for (let s of symbols) { if (r < s.weight) return s; r -= s.weight; }
+    }
+
+    spinBtn.addEventListener('click', () => {
+        spinBtn.disabled = true;
+        document.getElementById('status').innerText = "MUDA MUDA MUDA!";
+        strips.forEach(s => { s.style.transition = 'none'; s.style.top = '0px'; });
+
+        setTimeout(() => {
+            const results = [weightedRandom(), weightedRandom(), weightedRandom()];
+            strips.forEach((strip, i) => {
+                const symbolIndex = symbols.findIndex(s => s.id === results[i].id);
+                const finalPosition = -((15 * symbols.length * 140) + (symbolIndex * 140));
+                strip.style.transition = `top ${2 + (i * 0.7)}s cubic-bezier(0.1, 0, 0.1, 1)`;
+                strip.style.top = `${finalPosition}px`;
+            });
+            setTimeout(() => { checkWinner(results); spinBtn.disabled = false; }, 3500);
+        }, 50);
+    });
+
+    function checkWinner(results) {
+        const counts = {};
+        results.forEach(r => { counts[r.id] = (counts[r.id] || 0) + 1; });
+
+        // Sort payouts so that rules requiring 3 matches are checked before rules requiring 1
+        const sortedPayouts = [...payouts].sort((a, b) => b.count - a.count);
+        
+        const winRule = sortedPayouts.find(p => counts[p.symId] >= p.count);
+
+        if (winRule) {
+            document.getElementById('status').innerText = winRule.message;
+        } else {
+            document.getElementById('status').innerText = "YARE YARE DAZE...";
+        }
+    }
+
+    renderAll();
+</script>
+</body>
+</html>
