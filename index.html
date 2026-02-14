@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>JoJo Slots: Permanent Stand</title>
+    <title>Stardust Cards: The Final Deck</title>
     <style>
         :root {
             --jojo-purple: #4b0082;
@@ -73,31 +73,26 @@
             border-radius: 50px;
             cursor: pointer;
             box-shadow: 0 5px 15px rgba(255, 0, 255, 0.4);
+            transition: transform 0.1s;
         }
 
-        .admin-section {
-            margin-top: 40px;
-            background: #222;
-            padding: 20px;
-            border-radius: 12px;
-            width: 90%;
-            max-width: 900px;
-            border: 1px solid var(--jojo-purple);
-        }
+        #spin-btn:active { transform: scale(0.95); }
+        #spin-btn:disabled { filter: grayscale(1); cursor: wait; }
 
-        table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
-        th, td { padding: 10px; text-align: left; border-bottom: 1px solid #444; }
-        input, select { background: #111; color: white; border: 1px solid var(--jojo-gold); padding: 5px; }
-        
-        .remove-btn { color: #ff4d4d; cursor: pointer; font-weight: bold; }
-        .add-btn { background: var(--jojo-gold); color: black; border: none; padding: 10px 20px; cursor: pointer; border-radius: 5px; font-weight: bold; margin-right: 10px;}
-        .reset-btn { background: #ff4d4d; color: white; border: none; padding: 10px 20px; cursor: pointer; border-radius: 5px; }
-        .preview-thumb { width: 35px; height: 35px; object-fit: cover; border-radius: 4px; }
+        .rules-hint {
+            margin-top: 30px;
+            background: rgba(75, 0, 130, 0.3);
+            padding: 15px;
+            border-radius: 10px;
+            max-width: 600px;
+            font-size: 0.9rem;
+            border: 1px solid var(--jojo-gold);
+        }
     </style>
 </head>
 <body>
 
-    <h1>STARDUST SLOTS</h1>
+    <h1>STARDUST CARDS</h1>
     
     <div class="machine-frame">
         <div class="reels-container">
@@ -108,152 +103,48 @@
     </div>
 
     <div class="controls">
-        <h2 id="status">INITIALIZING...</h2>
+        <h2 id="status">LET THE GAME BEGIN</h2>
         <button id="spin-btn">SPIN!</button>
     </div>
 
-    <div class="admin-section">
-        <h3>1. Roster & 2. Payouts</h3>
-        <p style="color: var(--jojo-gold); font-size: 0.9rem;">Automatic saving enabled.</p>
-        
-        <table id="symbol-table">
-            <thead><tr><th>Icon</th><th>ID</th><th>Upload</th><th>Weight</th><th>Action</th></tr></thead>
-            <tbody id="symbol-body"></tbody>
-        </table>
-        <button class="add-btn" onclick="addSymbol()">+ Add Character</button>
-
-        <hr style="border: 0.5px solid #444; margin: 20px 0;">
-
-        <table id="payout-table">
-            <thead><tr><th>If hit...</th><th>Count</th><th>Message</th><th>Action</th></tr></thead>
-            <tbody id="payout-body"></tbody>
-        </table>
-        <button class="add-btn" onclick="addPayout()">+ Add Rule</button>
-        <button class="reset-btn" onclick="clearAllData()">⚠️ Factory Reset</button>
+    <div class="rules-hint">
+        <strong>Payouts:</strong><br>
+        • Jack (x2: Jack of All trades | x3: Uncommon Jackpot)<br>
+        • Queen (x2: Queens pawn | x3: Rare Jackpot)<br>
+        • King (x2: Kings crown | x3: Very Rare Jackpot)<br>
+        • Ace (x2: Ace in the sleeve | x3: Legendary Jackpot)<br>
+        • Death (x1: BACKLASH | x2: I LOST THE HOUSE | x3: NO STAND FOR YOU)
     </div>
 
 <script>
-    // --- DATABASE ---
-    let symbols = [];
-    let payouts = [];
-
-    const defaultSymbols = [
-        { id: "Jotaro", url: "https://via.placeholder.com/140/4b0082/ffffff?text=JOTARO", weight: 10 },
-        { id: "DIO", url: "https://via.placeholder.com/140/ffd700/000000?text=DIO", weight: 5 }
+    // HARD-CODED SYMBOLS (Baking images directly into the script)
+    const symbols = [
+        { id: "Jack", url: "https://i.ibb.co/3ykc5p9/jack.png", weight: 6 },
+        { id: "Queen", url: "https://i.ibb.co/L1r6r8F/queen.png", weight: 5 },
+        { id: "King", url: "https://i.ibb.co/f4n6p7Z/king.png", weight: 4 },
+        { id: "Ace", url: "https://i.ibb.co/C0L6fX0/ace.png", weight: 3 },
+        { id: "Death", url: "https://i.ibb.co/mSgtL8V/death.png", weight: 2 }
     ];
 
-    const defaultPayouts = [
-        { symId: "DIO", count: 3, message: "ZA WARUDO!" }
+    // PAYOUT RULES
+    const payouts = [
+        // Death Rules
+        { symId: "Death", count: 3, message: "NO STAND FOR YOU" },
+        { symId: "Death", count: 2, message: "I LOST THE HOUSE" },
+        { symId: "Death", count: 1, message: "BACKLASH" },
+        // Ace Rules
+        { symId: "Ace", count: 3, message: "LEGENDARY JACKPOT" },
+        { symId: "Ace", count: 2, message: "Ace in the sleeve" },
+        // King Rules
+        { symId: "King", count: 3, message: "VERY RARE JACKPOT" },
+        { symId: "King", count: 2, message: "Kings crown" },
+        // Queen Rules
+        { symId: "Queen", count: 3, message: "RARE JACKPOT" },
+        { symId: "Queen", count: 2, message: "Queens pawn" },
+        // Jack Rules
+        { symId: "Jack", count: 3, message: "UNCOMMON JACKPOT" },
+        { symId: "Jack", count: 2, message: "Jack of All trades" }
     ];
-
-    // --- SAVE / LOAD ---
-
-    function saveData() {
-        try {
-            localStorage.setItem('jojo_slots_symbols', JSON.stringify(symbols));
-            localStorage.setItem('jojo_slots_payouts', JSON.stringify(payouts));
-            console.log("Data saved to local storage.");
-        } catch (e) {
-            alert("Storage full! Try using smaller images.");
-        }
-    }
-
-    function loadData() {
-        const savedS = localStorage.getItem('jojo_slots_symbols');
-        const savedP = localStorage.getItem('jojo_slots_payouts');
-
-        // Only use defaults if there is NO saved data at all
-        if (savedS && savedS !== "[]") {
-            symbols = JSON.parse(savedS);
-        } else {
-            symbols = [...defaultSymbols];
-        }
-
-        if (savedP && savedP !== "[]") {
-            payouts = JSON.parse(savedP);
-        } else {
-            payouts = [...defaultPayouts];
-        }
-        
-        renderAll();
-    }
-
-    function clearAllData() {
-        if(confirm("This will delete all your custom images and rules. Proceed?")) {
-            localStorage.removeItem('jojo_slots_symbols');
-            localStorage.removeItem('jojo_slots_payouts');
-            location.reload();
-        }
-    }
-
-    // --- UI RENDERING ---
-
-    function renderAll() {
-        renderSymbols();
-        renderPayouts();
-        initStrips();
-        document.getElementById('status').innerText = "STAND READY";
-    }
-
-    function renderSymbols() {
-        const body = document.getElementById('symbol-body');
-        body.innerHTML = '';
-        symbols.forEach((s, i) => {
-            body.innerHTML += `<tr>
-                <td><img src="${s.url}" class="preview-thumb"></td>
-                <td><input type="text" value="${s.id}" onchange="updateSym(${i}, 'id', this.value)"></td>
-                <td><input type="file" accept="image/*" onchange="handleFileUpload(event, ${i})"></td>
-                <td><input type="number" value="${s.weight}" onchange="updateSym(${i}, 'weight', parseInt(this.value))" style="width:50px"></td>
-                <td><span class="remove-btn" onclick="removeSymbol(${i})">✖</span></td>
-            </tr>`;
-        });
-    }
-
-    function renderPayouts() {
-        const body = document.getElementById('payout-body');
-        body.innerHTML = '';
-        payouts.forEach((p, i) => {
-            body.innerHTML += `<tr>
-                <td>${createDropdown(i, p.symId)}</td>
-                <td><select onchange="updatePayout(${i}, 'count', parseInt(this.value))">
-                    <option value="1" ${p.count===1?'selected':''}>1x</option>
-                    <option value="2" ${p.count===2?'selected':''}>2x</option>
-                    <option value="3" ${p.count===3?'selected':''}>3x</option>
-                </select></td>
-                <td><input type="text" value="${p.message}" onchange="updatePayout(${i}, 'message', this.value)" style="width:90%"></td>
-                <td><span class="remove-btn" onclick="removePayout(${i})">✖</span></td>
-            </tr>`;
-        });
-    }
-
-    function createDropdown(pIndex, currentVal) {
-        let html = `<select onchange="updatePayout(${pIndex}, 'symId', this.value)">`;
-        symbols.forEach(s => { html += `<option value="${s.id}" ${s.id === currentVal ? 'selected' : ''}>${s.id}</option>`; });
-        return html + `</select>`;
-    }
-
-    function handleFileUpload(event, index) {
-        const file = event.target.files[0];
-        if (file) {
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                symbols[index].url = e.target.result;
-                saveData();
-                renderAll();
-            };
-            reader.readAsDataURL(file);
-        }
-    }
-
-    function updateSym(i, key, val) { symbols[i][key] = val; renderPayouts(); saveData(); }
-    function addSymbol() { symbols.push({ id: "New"+symbols.length, url: "https://via.placeholder.com/140", weight: 10 }); renderAll(); saveData(); }
-    function removeSymbol(i) { if(symbols.length > 1) { symbols.splice(i, 1); renderAll(); saveData(); } }
-    
-    function updatePayout(i, key, val) { payouts[i][key] = val; saveData(); }
-    function addPayout() { payouts.push({ symId: symbols[0].id, count: 1, message: "Win!" }); renderPayouts(); saveData(); }
-    function removePayout(i) { payouts.splice(i, 1); renderPayouts(); saveData(); }
-
-    // --- ANIMATION ---
 
     const strips = [document.getElementById('strip1'), document.getElementById('strip2'), document.getElementById('strip3')];
 
@@ -261,53 +152,64 @@
         strips.forEach(strip => {
             strip.innerHTML = '';
             const list = [];
-            for(let i=0; i<20; i++) { list.push(...symbols); }
+            for(let i=0; i<30; i++) { list.push(...symbols); }
             list.forEach(s => {
                 const img = document.createElement('img');
                 img.src = s.url;
                 strip.appendChild(img);
             });
-            strip.style.transition = 'none'; strip.style.top = '0px';
+            strip.style.transition = 'none';
+            strip.style.top = '0px';
         });
     }
 
     function weightedRandom() {
-        let total = symbols.reduce((s, item) => s + (item.weight || 1), 0);
+        let total = symbols.reduce((s, item) => s + item.weight, 0);
         let r = Math.random() * total;
-        for (let s of symbols) { if (r < s.weight) return s; r -= s.weight; }
+        for (let s of symbols) {
+            if (r < s.weight) return s;
+            r -= s.weight;
+        }
     }
 
     document.getElementById('spin-btn').addEventListener('click', () => {
         const btn = document.getElementById('spin-btn');
         btn.disabled = true;
-        document.getElementById('status').innerText = "MUDA MUDA MUDA!";
+        document.getElementById('status').innerText = "ROLLING...";
+        
         strips.forEach(s => { s.style.transition = 'none'; s.style.top = '0px'; });
 
         setTimeout(() => {
             const results = [weightedRandom(), weightedRandom(), weightedRandom()];
             strips.forEach((strip, i) => {
                 const symbolIndex = symbols.findIndex(s => s.id === results[i].id);
-                const finalPosition = -((10 * symbols.length * 140) + (symbolIndex * 140));
-                strip.style.transition = `top ${1.5 + (i * 0.5)}s cubic-bezier(0.1, 0, 0.1, 1)`;
+                const finalPosition = -((15 * symbols.length * 140) + (symbolIndex * 140));
+                strip.style.transition = `top ${1.5 + (i * 0.7)}s cubic-bezier(0.1, 0, 0.1, 1)`;
                 strip.style.top = `${finalPosition}px`;
             });
-            setTimeout(() => { 
-                checkWinner(results); 
-                btn.disabled = false; 
-            }, 3000);
+
+            setTimeout(() => {
+                checkWinner(results);
+                btn.disabled = false;
+            }, 3500);
         }, 50);
     });
 
     function checkWinner(results) {
         const counts = {};
         results.forEach(r => { counts[r.id] = (counts[r.id] || 0) + 1; });
-        const sortedPayouts = [...payouts].sort((a, b) => b.count - a.count);
-        const winRule = sortedPayouts.find(p => counts[p.symId] >= p.count);
-        document.getElementById('status').innerText = winRule ? winRule.message : "YARE YARE DAZE...";
+
+        // We check rules in order. Rules requiring higher counts (3) are checked first.
+        const winRule = payouts.find(p => counts[p.symId] >= p.count);
+
+        if (winRule) {
+            document.getElementById('status').innerText = winRule.message;
+        } else {
+            document.getElementById('status').innerText = "Nothing Special...";
+        }
     }
 
-    // START
-    loadData();
+    initStrips();
 </script>
 </body>
 </html>
