@@ -3,202 +3,154 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>STARDUST CASINO: NEON STAND</title>
+    <title>NEON CASINO: STARDUST</title>
     <style>
         :root {
             --neon-green: #39ff14;
-            --neon-cyan: #00f3ff;
             --neon-purple: #bc13fe;
-            --dark-overlay: rgba(0, 0, 0, 0.85);
+            --neon-pink: #ff00ff;
+            --bg-dark: #050505;
         }
 
         body {
-            background: black url('https://images.unsplash.com/photo-1596838132731-ee30a3478245?q=80&w=2070') no-repeat center center fixed;
-            background-size: cover;
+            background-color: var(--bg-dark);
+            background-image: 
+                radial-gradient(circle at 20% 30%, rgba(188, 19, 254, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 70%, rgba(57, 255, 20, 0.1) 0%, transparent 50%);
             color: white;
-            font-family: 'Segoe UI', Impact, sans-serif;
+            font-family: 'Segoe UI', sans-serif;
             display: flex;
             flex-direction: column;
             align-items: center;
             margin: 0;
+            overflow-x: hidden;
             min-height: 100vh;
         }
 
-        /* Darkening the casino background for contrast */
-        body::before {
-            content: "";
+        /* Menacing Kanji floating in corners */
+        .kanji {
             position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: var(--dark-overlay);
-            z-index: -1;
-        }
-
-        .casino-header {
-            text-align: center;
-            padding: 20px;
-            z-index: 10;
+            color: var(--neon-purple);
+            font-size: 5rem;
+            opacity: 0.3;
+            font-weight: bold;
+            font-style: italic;
+            z-index: 0;
+            pointer-events: none;
         }
 
         h1 {
             color: var(--neon-green);
-            text-shadow: 0 0 10px var(--neon-green), 0 0 20px var(--neon-green);
+            text-shadow: 0 0 10px var(--neon-green), 0 0 20px var(--neon-purple);
             font-size: 3.5rem;
-            margin: 0;
-            letter-spacing: 8px;
-            font-style: italic;
-        }
-
-        /* The Stand Character Visual */
-        .stand-container {
-            position: absolute;
-            top: 10%;
-            width: 800px;
-            height: 600px;
-            opacity: 0.15; /* Starts faint */
-            transition: opacity 0.5s ease;
-            z-index: 1;
-            pointer-events: none;
-        }
-
-        .stand-container img {
-            width: 100%;
-            height: 100%;
-            object-fit: contain;
-        }
-
-        /* Pity Bar (Luck Meter) */
-        .pity-wrapper {
+            margin: 30px 0 10px 0;
+            letter-spacing: 10px;
             z-index: 10;
-            width: 400px;
+        }
+
+        /* Pity System Style */
+        .pity-container {
+            width: 350px;
+            margin-bottom: 30px;
+            z-index: 10;
             text-align: center;
-            margin-bottom: 20px;
         }
 
-        .pity-label {
-            color: var(--neon-cyan);
-            font-weight: bold;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            margin-bottom: 8px;
-            display: block;
-        }
+        .pity-label { color: var(--neon-pink); text-transform: uppercase; font-weight: bold; margin-bottom: 5px; display: block; }
+        .pity-bar { width: 100%; height: 12px; background: #111; border: 2px solid var(--neon-pink); border-radius: 10px; overflow: hidden; }
+        #pity-fill { height: 100%; width: 0%; background: var(--neon-pink); box-shadow: 0 0 10px var(--neon-pink); transition: width 0.3s; }
 
-        .pity-bar-bg {
-            width: 100%;
-            height: 15px;
-            background: #222;
-            border: 2px solid var(--neon-cyan);
-            border-radius: 20px;
-            overflow: hidden;
-            box-shadow: 0 0 15px rgba(0, 243, 255, 0.4);
-        }
-
-        #pity-fill {
-            height: 100%;
-            width: 0%;
-            background: linear-gradient(90deg, var(--neon-cyan), var(--neon-green));
-            transition: width 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        }
-
-        /* Slot Machine Styles */
-        .machine-frame {
-            background: #111;
-            padding: 25px;
-            border: 6px solid var(--neon-green);
-            border-radius: 30px;
-            box-shadow: 0 0 40px var(--neon-green);
-            z-index: 5;
-            position: relative;
-        }
-
-        .reels-container {
-            display: flex;
-            gap: 20px;
-            background: #000;
-            padding: 15px;
+        /* The Slot Machine */
+        .machine {
+            background: linear-gradient(145deg, #1a1a1a, #000);
+            padding: 20px;
+            border: 4px solid #333;
+            border-top: 4px solid var(--neon-green);
+            border-bottom: 4px solid var(--neon-purple);
             border-radius: 15px;
-            border: 3px solid #333;
+            box-shadow: 0 20px 50px rgba(0,0,0,1), 0 0 20px rgba(57, 255, 20, 0.2);
+            z-index: 10;
+        }
+
+        .reels {
+            display: flex;
+            gap: 15px;
+            background: #000;
+            padding: 10px;
+            border-radius: 5px;
         }
 
         .reel {
             width: 140px;
             height: 200px;
-            background: #050505;
+            background: #111;
             overflow: hidden;
             position: relative;
-            border-radius: 10px;
+            border: 1px solid #222;
         }
 
-        .reel-strip img { width: 140px; height: 200px; display: block; object-fit: contain; }
-
-        .controls { margin-top: 30px; text-align: center; z-index: 10; }
-
-        #status { 
-            height: 1.5em; 
-            color: white; 
-            font-size: 2.2rem; 
-            text-shadow: 0 0 10px var(--neon-purple);
-            margin-bottom: 20px;
-            font-weight: bold;
+        .strip {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
         }
 
-        #spin-btn {
-            background: black;
+        .strip img { width: 140px; height: 200px; object-fit: contain; }
+
+        .controls { margin-top: 40px; text-align: center; z-index: 10; }
+        #status { height: 1.2em; font-size: 2rem; color: var(--neon-green); margin-bottom: 20px; text-shadow: 0 0 5px #000; }
+
+        button {
+            background: transparent;
             color: var(--neon-green);
-            padding: 20px 80px;
-            font-size: 2rem;
+            border: 2px solid var(--neon-green);
+            padding: 15px 60px;
+            font-size: 1.5rem;
             font-weight: bold;
-            border: 4px solid var(--neon-green);
-            border-radius: 15px;
             cursor: pointer;
             transition: 0.3s;
             text-transform: uppercase;
-            box-shadow: 0 0 15px var(--neon-green);
         }
 
-        #spin-btn:hover {
+        button:hover:not(:disabled) {
             background: var(--neon-green);
             color: black;
             box-shadow: 0 0 30px var(--neon-green);
         }
 
-        #spin-btn:disabled { opacity: 0.2; cursor: wait; }
+        button:disabled { opacity: 0.2; }
     </style>
 </head>
 <body>
 
-    <div class="stand-container" id="stand-visual">
-        <img src="stand.png" alt="">
+    <div class="kanji" style="top:10%; left:10%;">ゴ</div>
+    <div class="kanji" style="bottom:15%; right:10%;">ゴ</div>
+    <div class="kanji" style="top:40%; right:5%;">ゴ</div>
+
+    <h1>CASINO STARDUST</h1>
+
+    <div class="pity-container">
+        <span class="pity-label">JACKPOT LUCK METER</span>
+        <div class="pity-bar"><div id="pity-fill"></div></div>
     </div>
 
-    <div class="casino-header">
-        <h1>STARDUST CASINO</h1>
-    </div>
-
-    <div class="pity-wrapper">
-        <span class="pity-label">Stand Luck: <span id="pity-count">0</span>/10</span>
-        <div class="pity-bar-bg">
-            <div id="pity-fill"></div>
-        </div>
-    </div>
-    
-    <div class="machine-frame">
-        <div class="reels-container">
-            <div class="reel"><div id="strip1" class="reel-strip"></div></div>
-            <div class="reel"><div id="strip2" class="reel-strip"></div></div>
-            <div class="reel"><div id="strip3" class="reel-strip"></div></div>
+    <div class="machine">
+        <div class="reels">
+            <div class="reel"><div id="strip1" class="strip"></div></div>
+            <div class="reel"><div id="strip2" class="strip"></div></div>
+            <div class="reel"><div id="strip3" class="strip"></div></div>
         </div>
     </div>
 
     <div class="controls">
-        <h2 id="status">GO AHEAD, MISTER JOESTAR</h2>
+        <div id="status">INSERT COIN</div>
         <button id="spin-btn">SPIN</button>
     </div>
 
 <script>
-    const pityLimit = 10; // Change this to make it harder or easier
-    let currentMisses = 0;
-
     const symbols = [
         { id: "Jack", url: "jack.png", weight: 6 },
         { id: "Queen", url: "queen.png", weight: 5 },
@@ -207,30 +159,21 @@
         { id: "Death", url: "death.png", weight: 2 }
     ];
 
-    const payouts = [
-        { symId: "Death", count: 3, message: "NO STAND FOR YOU (JACKPOT)" },
-        { symId: "Ace", count: 3, message: "LEGENDARY JACKPOT" },
-        { symId: "King", count: 3, message: "VERY RARE JACKPOT" },
-        { symId: "Queen", count: 3, message: "RARE JACKPOT" },
-        { symId: "Jack", count: 3, message: "UNCOMMON JACKPOT" },
-        // These are minor wins, they WON'T reset pity
-        { symId: "Ace", count: 2, message: "Ace in the sleeve" },
-        { symId: "Death", count: 2, message: "I LOST THE HOUSE" },
-        { symId: "Death", count: 1, message: "BACKLASH" }
-    ];
-
+    let currentMisses = 0;
+    const pityLimit = 10;
     const strips = [document.getElementById('strip1'), document.getElementById('strip2'), document.getElementById('strip3')];
 
-    function initStrips() {
+    function buildStrips() {
         strips.forEach(strip => {
             strip.innerHTML = '';
-            for(let i=0; i<40; i++) {
-                symbols.forEach(s => {
-                    const img = document.createElement('img');
-                    img.src = s.url;
-                    strip.appendChild(img);
-                });
-            }
+            // We create a very long list so the rolling looks smooth
+            const fullList = [];
+            for(let i=0; i<50; i++) { fullList.push(...symbols); }
+            fullList.forEach(s => {
+                const img = document.createElement('img');
+                img.src = s.url;
+                strip.appendChild(img);
+            });
         });
     }
 
@@ -243,74 +186,53 @@
         }
     }
 
-    function updatePityUI() {
-        const percent = (currentMisses / pityLimit) * 100;
-        document.getElementById('pity-fill').style.width = percent + "%";
-        document.getElementById('pity-count').innerText = currentMisses;
-        
-        // Make the stand character more visible as pity rises
-        const stand = document.getElementById('stand-visual');
-        stand.style.opacity = 0.15 + (percent / 150);
-    }
-
-    document.getElementById('spin-btn').addEventListener('click', () => {
-        const btn = document.getElementById('spin-btn');
+    document.getElementById('spin-btn').addEventListener('click', function() {
+        const btn = this;
         btn.disabled = true;
-        document.getElementById('status').innerText = "SPINNING...";
+        document.getElementById('status').innerText = "ROLLING...";
+        
+        // Reset positions to top instantly before rolling
         strips.forEach(s => { s.style.transition = 'none'; s.style.top = '0px'; });
 
         setTimeout(() => {
             let results;
-            
-            // PITY TRIGGER: Force a 3x Jackpot
             if (currentMisses >= pityLimit) {
-                const luckyCard = symbols[Math.floor(Math.random() * symbols.length)];
-                results = [luckyCard, luckyCard, luckyCard];
+                const win = symbols[Math.floor(Math.random() * symbols.length)];
+                results = [win, win, win];
             } else {
                 results = [weightedRandom(), weightedRandom(), weightedRandom()];
             }
 
             strips.forEach((strip, i) => {
                 const symbolIndex = symbols.findIndex(s => s.id === results[i].id);
-                const finalPos = -((25 * symbols.length * 200) + (symbolIndex * 200));
-                strip.style.transition = `top ${2 + (i * 0.4)}s cubic-bezier(0.1, 0, 0, 1)`;
-                strip.style.top = `${finalPos}px`;
+                // The math: Move down past most of the icons, then stop on the result
+                const moveAmount = ((40 * symbols.length) + symbolIndex) * 200;
+                strip.style.transition = `top ${2 + (i * 0.5)}s cubic-bezier(0.1, 0, 0.1, 1)`;
+                strip.style.top = `-${moveAmount}px`;
             });
 
-            setTimeout(() => { 
-                checkWinner(results); 
+            setTimeout(() => {
+                const counts = {};
+                results.forEach(r => counts[r.id] = (counts[r.id] || 0) + 1);
+                
+                // Logic: 3-of-a-kind (any, including Death) is a Jackpot and resets pity
+                const jackpot = symbols.find(s => counts[s.id] === 3);
+                
+                if (jackpot) {
+                    document.getElementById('status').innerText = jackpot.id === "Death" ? "TRIPLE DEATH JACKPOT" : "LUCKY JACKPOT!";
+                    currentMisses = 0;
+                } else {
+                    document.getElementById('status').innerText = "NOTHING SPECIAL...";
+                    currentMisses++;
+                }
+
+                document.getElementById('pity-fill').style.width = (currentMisses / pityLimit * 100) + "%";
                 btn.disabled = false;
-                updatePityUI();
-            }, 3200);
+            }, 3500);
         }, 50);
     });
 
-    function checkWinner(results) {
-        const counts = {};
-        results.forEach(r => { counts[r.id] = (counts[r.id] || 0) + 1; });
-        
-        // Check for ANY 3-of-a-kind (The true Jackpots)
-        let isTrueJackpot = false;
-        const winRule = payouts.find(p => counts[p.symId] >= p.count);
-
-        if (winRule) {
-            document.getElementById('status').innerText = winRule.message;
-            if (winRule.count === 3) {
-                isTrueJackpot = true;
-                currentMisses = 0; // RESET ON ANY JACKPOT
-                document.getElementById('status').style.color = "var(--neon-green)";
-            } else {
-                currentMisses++; // 2x wins don't reset pity
-                document.getElementById('status').style.color = "white";
-            }
-        } else {
-            document.getElementById('status').innerText = "NOTHING SPECIAL...";
-            document.getElementById('status').style.color = "white";
-            currentMisses++;
-        }
-    }
-
-    initStrips();
+    buildStrips();
 </script>
 </body>
 </html>
