@@ -36,7 +36,6 @@
             font-style: italic;
             z-index: 0;
             pointer-events: none;
-            user-select: none;
         }
 
         h1 {
@@ -46,7 +45,6 @@
             margin: 30px 0 10px 0;
             letter-spacing: 10px;
             z-index: 10;
-            text-align: center;
         }
 
         .pity-container {
@@ -56,9 +54,9 @@
             text-align: center;
         }
 
-        .pity-label { color: var(--neon-pink); text-transform: uppercase; font-weight: bold; margin-bottom: 5px; display: block; font-size: 0.9rem; }
-        .pity-bar { width: 100%; height: 12px; background: #111; border: 2px solid var(--neon-pink); border-radius: 10px; overflow: hidden; box-shadow: 0 0 10px rgba(255, 0, 255, 0.2); }
-        #pity-fill { height: 100%; width: 0%; background: var(--neon-pink); box-shadow: 0 0 10px var(--neon-pink); transition: width 0.4s ease-out; }
+        .pity-label { color: var(--neon-pink); text-transform: uppercase; font-weight: bold; margin-bottom: 5px; display: block; }
+        .pity-bar { width: 100%; height: 12px; background: #111; border: 2px solid var(--neon-pink); border-radius: 10px; overflow: hidden; }
+        #pity-fill { height: 100%; width: 0%; background: var(--neon-pink); box-shadow: 0 0 10px var(--neon-pink); transition: width 0.4s; }
 
         .machine {
             background: linear-gradient(145deg, #1a1a1a, #000);
@@ -67,7 +65,7 @@
             border-top: 4px solid var(--neon-green);
             border-bottom: 4px solid var(--neon-purple);
             border-radius: 20px;
-            box-shadow: 0 20px 50px rgba(0,0,0,1), 0 0 30px rgba(57, 255, 20, 0.1);
+            box-shadow: 0 20px 50px rgba(0,0,0,1);
             z-index: 10;
         }
 
@@ -88,17 +86,11 @@
             border: 1px solid #222;
         }
 
-        .strip {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-        }
-
+        .strip { position: absolute; top: 0; left: 0; width: 100%; }
         .strip img { width: 140px; height: 200px; display: block; object-fit: contain; }
 
         .controls { margin-top: 40px; text-align: center; z-index: 10; }
-        #status { height: 1.5em; font-size: 1.8rem; color: var(--neon-green); margin-bottom: 20px; font-weight: bold; text-shadow: 0 0 10px rgba(0,0,0,0.5); }
+        #status { height: 1.5em; font-size: 1.8rem; color: var(--neon-green); margin-bottom: 20px; font-weight: bold; }
 
         button {
             background: transparent;
@@ -108,31 +100,23 @@
             font-size: 1.8rem;
             font-weight: bold;
             cursor: pointer;
-            transition: 0.3s;
-            text-transform: uppercase;
             border-radius: 10px;
-            box-shadow: 0 0 10px var(--neon-green);
+            text-transform: uppercase;
         }
 
-        button:hover:not(:disabled) {
-            background: var(--neon-green);
-            color: black;
-            box-shadow: 0 0 30px var(--neon-green);
-        }
-
-        button:disabled { opacity: 0.2; cursor: wait; box-shadow: none; }
+        button:hover:not(:disabled) { background: var(--neon-green); color: black; box-shadow: 0 0 30px var(--neon-green); }
+        button:disabled { opacity: 0.2; }
     </style>
 </head>
 <body>
 
     <div class="kanji" style="top:10%; left:5%;">ゴ</div>
     <div class="kanji" style="bottom:10%; right:5%;">ゴ</div>
-    <div class="kanji" style="top:40%; right:8%;">ゴ</div>
 
     <h1>CASINO STARDUST</h1>
 
     <div class="pity-container">
-        <span class="pity-label">STAND LUCK METER</span>
+        <span class="pity-label">JACKPOT LUCK METER</span>
         <div class="pity-bar"><div id="pity-fill"></div></div>
     </div>
 
@@ -145,7 +129,7 @@
     </div>
 
     <div class="controls">
-        <div id="status">GOOD LUCK</div>
+        <div id="status">DEAL THE CARDS</div>
         <button id="spin-btn">SPIN</button>
     </div>
 
@@ -157,21 +141,6 @@
         { id: "Ace", url: "ace.png", weight: 3 },
         { id: "Death", url: "death.png", weight: 2 }
     ];
-
-    // Added all requested payout texts
-    const winMessages = {
-        "Jack3": "UNCOMMON JACKPOT",
-        "Jack2": "Jack of All trades",
-        "Queen3": "RARE JACKPOT",
-        "Queen2": "Queens pawn",
-        "King3": "VERY RARE JACKPOT",
-        "King2": "Kings crown",
-        "Ace3": "LEGENDARY JACKPOT",
-        "Ace2": "Ace in the sleeve",
-        "Death3": "NO STAND FOR YOU",
-        "Death2": "I LOST THE HOUSE",
-        "Death1": "BACKLASH"
-    };
 
     let currentMisses = 0;
     const pityLimit = 10;
@@ -200,18 +169,14 @@
     }
 
     document.getElementById('spin-btn').addEventListener('click', function() {
-        const btn = this;
-        btn.disabled = true;
+        this.disabled = true;
         document.getElementById('status').innerText = "ROLLING...";
-        
-        // Reset positions to ensure they move from the top every time
         strips.forEach(s => { s.style.transition = 'none'; s.style.top = '0px'; });
 
         setTimeout(() => {
             let results;
             if (currentMisses >= pityLimit) {
-                // Guaranteed 3x Jackpot (excluding Death for the Pity win)
-                const win = symbols[Math.floor(Math.random() * 4)]; 
+                const win = symbols[Math.floor(Math.random() * 5)]; 
                 results = [win, win, win];
             } else {
                 results = [weightedRandom(), weightedRandom(), weightedRandom()];
@@ -219,7 +184,6 @@
 
             strips.forEach((strip, i) => {
                 const symbolIndex = symbols.findIndex(s => s.id === results[i].id);
-                // Large move amount to make the spin look fast
                 const moveAmount = ((50 * symbols.length) + symbolIndex) * 200;
                 strip.style.transition = `top ${2 + (i * 0.5)}s cubic-bezier(0.1, 0, 0.1, 1)`;
                 strip.style.top = `-${moveAmount}px`;
@@ -229,41 +193,42 @@
                 const counts = {};
                 results.forEach(r => counts[r.id] = (counts[r.id] || 0) + 1);
                 
-                let foundWin = false;
                 let message = "Nothing Special...";
+                let isJackpot = false;
 
-                // Priority logic: 3 of a kind > 2 of a kind > 1 Death
-                for (const s of symbols) {
-                    if (counts[s.id] === 3) {
-                        message = winMessages[s.id + "3"];
-                        currentMisses = 0; // Reset Pity on Jackpot
-                        foundWin = true;
-                        break;
-                    }
+                // 1. CHECK FOR 3 OF A KIND (JACKPOTS)
+                const jackpot = symbols.find(s => counts[s.id] === 3);
+                if (jackpot) {
+                    isJackpot = true;
+                    if (jackpot.id === "Jack") message = "UNCOMMON JACKPOT";
+                    if (jackpot.id === "Queen") message = "RARE JACKPOT";
+                    if (jackpot.id === "King") message = "VERY RARE JACKPOT";
+                    if (jackpot.id === "Ace") message = "LEGENDARY JACKPOT";
+                    if (jackpot.id === "Death") message = "NO STAND FOR YOU";
+                } 
+                // 2. CHECK FOR DEATH PRIORITY (IF NO JACKPOT)
+                else if (counts["Death"] === 2) {
+                    message = "I LOST THE HOUSE";
+                } else if (counts["Death"] === 1) {
+                    message = "BACKLASH";
+                } 
+                // 3. CHECK FOR 2 OF A KIND (ONLY IF NO DEATH IS PRESENT)
+                else {
+                    if (counts["Jack"] === 2) message = "Jack of All trades";
+                    else if (counts["Queen"] === 2) message = "Queens pawn";
+                    else if (counts["King"] === 2) message = "Kings crown";
+                    else if (counts["Ace"] === 2) message = "Ace in the sleeve";
                 }
 
-                if (!foundWin) {
-                    for (const s of symbols) {
-                        if (counts[s.id] === 2) {
-                            message = winMessages[s.id + "2"];
-                            foundWin = true;
-                            break;
-                        }
-                    }
-                }
-
-                if (!foundWin && counts["Death"] === 1) {
-                    message = winMessages["Death1"];
-                    foundWin = true;
-                }
-
-                if (!foundWin) {
+                if (isJackpot) {
+                    currentMisses = 0;
+                } else {
                     currentMisses++;
                 }
 
                 document.getElementById('status').innerText = message;
-                document.getElementById('pity-fill').style.width = (currentMisses / pityLimit * 100) + "%";
-                btn.disabled = false;
+                document.getElementById('pity-fill').style.width = (Math.min(currentMisses / pityLimit, 1) * 100) + "%";
+                document.getElementById('spin-btn').disabled = false;
             }, 3500);
         }, 50);
     });
