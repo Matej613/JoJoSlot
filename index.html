@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NEON CASINO: STARDUST PURPLE</title>
+    <title>STARDUST CASINO: PURPLE AUDIO</title>
     <style>
         :root {
             --neon-purple: #9d00ff;
@@ -14,8 +14,7 @@
 
         body {
             background-color: var(--bg-dark);
-            background-image: 
-                radial-gradient(circle at 50% 50%, #1a0a2e 0%, var(--bg-dark) 100%);
+            background-image: radial-gradient(circle at 50% 50%, #1a0a2e 0%, var(--bg-dark) 100%);
             color: white;
             font-family: 'Segoe UI', Impact, sans-serif;
             display: flex;
@@ -23,71 +22,44 @@
             align-items: center;
             margin: 0;
             min-height: 100vh;
-            overflow-x: hidden;
-        }
-
-        .kanji {
-            position: fixed;
-            color: var(--neon-purple);
-            font-size: 6rem;
-            opacity: 0.15;
-            z-index: 0;
-            user-select: none;
         }
 
         h1 {
             color: white;
-            text-shadow: 0 0 10px var(--neon-purple), 0 0 20px var(--neon-purple);
+            text-shadow: 0 0 15px var(--neon-purple);
             font-size: 3.5rem;
             margin: 30px 0 10px;
             letter-spacing: 12px;
             font-style: italic;
         }
 
-        /* Pity Meter */
-        .pity-container { width: 350px; margin-bottom: 30px; z-index: 10; text-align: center; }
-        .pity-label { color: var(--neon-pink); font-size: 0.8rem; letter-spacing: 2px; margin-bottom: 5px; display: block; }
+        .pity-container { width: 350px; margin-bottom: 30px; text-align: center; }
         .pity-bar { width: 100%; height: 10px; background: #000; border: 1px solid var(--neon-purple); border-radius: 5px; overflow: hidden; }
         #pity-fill { height: 100%; width: 0%; background: var(--neon-purple); box-shadow: 0 0 15px var(--neon-purple); transition: width 0.4s; }
 
-        /* The Machine */
         .machine {
             background: #120a1d;
             padding: 25px;
             border: 4px solid var(--neon-purple);
             border-radius: 20px;
             box-shadow: 0 0 40px rgba(157, 0, 255, 0.3);
-            position: relative;
-            z-index: 10;
-            transition: transform 0.2s, box-shadow 0.5s;
+            transition: 0.3s;
         }
 
-        /* Win Visual Effects */
         .jackpot-glow { 
-            animation: jackpot-flash 0.5s infinite alternate; 
-            box-shadow: 0 0 60px var(--neon-gold) !important;
+            animation: jackpot-flash 0.3s infinite alternate; 
             border-color: var(--neon-gold) !important;
+            box-shadow: 0 0 60px var(--neon-gold) !important;
         }
-        @keyframes jackpot-flash {
-            from { filter: brightness(1); }
-            to { filter: brightness(1.5); }
-        }
+        @keyframes jackpot-flash { to { filter: brightness(1.8); transform: scale(1.02); } }
 
         .reels { display: flex; gap: 15px; background: #000; padding: 12px; border-radius: 10px; }
-        .reel { 
-            width: 140px; height: 200px; background: #050505; 
-            overflow: hidden; position: relative; border: 1px solid #222; 
-        }
-
+        .reel { width: 140px; height: 200px; background: #050505; overflow: hidden; position: relative; border: 1px solid #222; }
         .strip { position: absolute; top: 0; left: 0; width: 100%; }
         .strip img { width: 140px; height: 200px; display: block; object-fit: contain; }
 
-        .controls { margin-top: 40px; text-align: center; z-index: 10; }
-        #status { 
-            height: 1.5em; font-size: 1.8rem; color: white; 
-            margin-bottom: 20px; font-weight: bold;
-            transition: 0.3s;
-        }
+        .controls { margin-top: 40px; text-align: center; }
+        #status { height: 1.5em; font-size: 1.8rem; color: white; margin-bottom: 20px; font-weight: bold; }
 
         button {
             background: transparent;
@@ -100,26 +72,16 @@
             border-radius: 50px;
             text-transform: uppercase;
             transition: 0.3s;
-            box-shadow: 0 0 10px var(--neon-purple);
         }
-
-        button:hover:not(:disabled) {
-            background: var(--neon-purple);
-            box-shadow: 0 0 30px var(--neon-purple);
-        }
-
+        button:hover:not(:disabled) { background: var(--neon-purple); box-shadow: 0 0 30px var(--neon-purple); }
         button:disabled { opacity: 0.2; }
     </style>
 </head>
 <body>
 
-    <div class="kanji" style="top:15%; left:5%;">ゴ</div>
-    <div class="kanji" style="bottom:10%; right:5%;">ゴ</div>
-
     <h1>STARDUST</h1>
 
     <div class="pity-container">
-        <span class="pity-label">LUCK METER</span>
         <div class="pity-bar"><div id="pity-fill"></div></div>
     </div>
 
@@ -132,33 +94,45 @@
     </div>
 
     <div class="controls">
-        <div id="status">PRESS SPIN</div>
+        <div id="status">DEAL THE CARDS</div>
         <button id="spin-btn">SPIN</button>
     </div>
 
 <script>
-    // --- AUDIO SYSTEM (Web Audio API) ---
+    // --- ADVANCED AUDIO ENGINE ---
     const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    function playSound(freq, type, duration) {
+
+    function playNote(freq, type, start, duration, vol = 0.1) {
         const osc = audioCtx.createOscillator();
         const gain = audioCtx.createGain();
         osc.type = type;
-        osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
-        gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
-        gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + duration);
+        osc.frequency.setValueAtTime(freq, audioCtx.currentTime + start);
+        gain.gain.setValueAtTime(vol, audioCtx.currentTime + start);
+        gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + start + duration);
         osc.connect(gain);
         gain.connect(audioCtx.destination);
-        osc.start();
-        osc.stop(audioCtx.currentTime + duration);
+        osc.start(audioCtx.currentTime + start);
+        osc.stop(audioCtx.currentTime + start + duration);
     }
 
-    function playSpinSound() { playSound(150, 'sawtooth', 0.1); }
-    function playWinSound() {
-        [440, 554, 659, 880].forEach((f, i) => {
-            setTimeout(() => playSound(f, 'square', 0.3), i * 100);
-        });
-    }
-    function playDeathSound() { playSound(100, 'sine', 0.8); }
+    // Sound Effects Library
+    const sounds = {
+        click: () => playNote(150, 'sine', 0, 0.05, 0.3), // Reel stop
+        pair: () => { // 2 of a kind
+            playNote(523.25, 'triangle', 0, 0.2); 
+            playNote(659.25, 'triangle', 0.1, 0.3);
+        },
+        jackpot: () => { // Standard 3-of-a-kind
+            [523, 659, 783, 1046].forEach((f, i) => playNote(f, 'square', i * 0.1, 0.4, 0.05));
+        },
+        legendary: () => { // Ace Jackpot
+            for(let i=0; i<8; i++) playNote(523 + (i*100), 'sawtooth', i * 0.1, 0.5, 0.03);
+        },
+        death: () => { // Backlash / Death
+            playNote(100, 'sawtooth', 0, 0.5, 0.2);
+            playNote(110, 'sawtooth', 0.1, 0.5, 0.2);
+        }
+    };
 
     // --- GAME LOGIC ---
     const symbols = [
@@ -219,12 +193,15 @@
             strips.forEach((strip, i) => {
                 const symbolIndex = symbols.findIndex(s => s.id === results[i].id);
                 const moveAmount = ((50 * symbols.length) + symbolIndex) * 200;
-                strip.style.transition = `top ${2 + (i * 0.5)}s cubic-bezier(0.1, 0, 0.1, 1)`;
+                const duration = 2 + (i * 0.5);
+                strip.style.transition = `top ${duration}s cubic-bezier(0.1, 0, 0.1, 1)`;
                 strip.style.top = `-${moveAmount}px`;
-                // Add tiny beep during spin
-                setTimeout(() => playSpinSound(), 500);
+
+                // CLICK SOUND ON STOP
+                setTimeout(() => sounds.click(), duration * 1000);
             });
 
+            // Wait for final reel to stop before calculating win
             setTimeout(() => {
                 const counts = {};
                 results.forEach(r => counts[r.id] = (counts[r.id] || 0) + 1);
@@ -232,34 +209,29 @@
                 let msg = "Nothing Special...";
                 let isJackpot = false;
 
-                // Priority Check
                 const jackpot = symbols.find(s => counts[s.id] === 3);
                 if (jackpot) {
                     isJackpot = true;
-                    if (jackpot.id === "Jack") msg = "UNCOMMON JACKPOT";
-                    if (jackpot.id === "Queen") msg = "RARE JACKPOT";
-                    if (jackpot.id === "King") msg = "VERY RARE JACKPOT";
-                    if (jackpot.id === "Ace") msg = "LEGENDARY JACKPOT";
-                    if (jackpot.id === "Death") { msg = "NO STAND FOR YOU"; playDeathSound(); }
-                    else { playWinSound(); }
-                    
+                    currentMisses = 0;
                     machine.classList.add('jackpot-glow');
                     status.style.color = "var(--neon-gold)";
-                    currentMisses = 0;
-                } else if (counts["Death"] >= 1) {
+                    
+                    if (jackpot.id === "Ace") { msg = "LEGENDARY JACKPOT"; sounds.legendary(); }
+                    else if (jackpot.id === "Death") { msg = "NO STAND FOR YOU"; sounds.death(); }
+                    else { msg = jackpot.id.toUpperCase() + " JACKPOT"; sounds.jackpot(); }
+                } 
+                else if (counts["Death"] >= 1) {
                     msg = counts["Death"] === 2 ? "I LOST THE HOUSE" : "BACKLASH";
                     status.style.color = "#ff4444";
-                    playDeathSound();
+                    sounds.death();
                     currentMisses++;
-                } else {
+                } 
+                else {
                     const pair = symbols.find(s => counts[s.id] === 2);
                     if (pair) {
-                        if (pair.id === "Jack") msg = "Jack of All trades";
-                        if (pair.id === "Queen") msg = "Queens pawn";
-                        if (pair.id === "King") msg = "Kings crown";
-                        if (pair.id === "Ace") msg = "Ace in the sleeve";
+                        msg = pair.id === "Ace" ? "Ace in the sleeve" : pair.id + " Pair";
                         status.style.color = "var(--neon-purple)";
-                        playSound(300, 'sine', 0.2);
+                        sounds.pair();
                     }
                     currentMisses++;
                 }
@@ -267,7 +239,7 @@
                 status.innerText = msg;
                 document.getElementById('pity-fill').style.width = (Math.min(currentMisses/pityLimit, 1)*100) + "%";
                 this.disabled = false;
-            }, 3500);
+            }, 3200);
         }, 50);
     });
 
