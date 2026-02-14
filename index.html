@@ -3,143 +3,183 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>STARDUST CARDS: NEON EDITION</title>
+    <title>STARDUST CASINO: NEON STAND</title>
     <style>
         :root {
             --neon-green: #39ff14;
             --neon-cyan: #00f3ff;
-            --dark-carbon: #121212;
-            --gold: #ffd700;
+            --neon-purple: #bc13fe;
+            --dark-overlay: rgba(0, 0, 0, 0.85);
         }
 
         body {
-            background-color: #080808;
+            background: black url('https://images.unsplash.com/photo-1596838132731-ee30a3478245?q=80&w=2070') no-repeat center center fixed;
+            background-size: cover;
             color: white;
-            font-family: 'Segoe UI', sans-serif;
+            font-family: 'Segoe UI', Impact, sans-serif;
             display: flex;
             flex-direction: column;
             align-items: center;
             margin: 0;
-            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        /* Darkening the casino background for contrast */
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: var(--dark-overlay);
+            z-index: -1;
+        }
+
+        .casino-header {
+            text-align: center;
+            padding: 20px;
+            z-index: 10;
         }
 
         h1 {
             color: var(--neon-green);
-            text-shadow: 0 0 10px var(--neon-green), 2px 2px #000;
-            font-size: 3rem;
-            margin: 20px 0 5px 0;
-            letter-spacing: 5px;
-        }
-
-        .menacing {
-            color: #ff00ff;
-            font-weight: bold;
+            text-shadow: 0 0 10px var(--neon-green), 0 0 20px var(--neon-green);
+            font-size: 3.5rem;
+            margin: 0;
+            letter-spacing: 8px;
             font-style: italic;
-            animation: pulse 1.5s infinite;
         }
 
-        @keyframes pulse {
-            0% { transform: scale(1); opacity: 0.8; }
-            50% { transform: scale(1.1); opacity: 1; text-shadow: 0 0 15px #ff00ff; }
-            100% { transform: scale(1); opacity: 0.8; }
+        /* The Stand Character Visual */
+        .stand-container {
+            position: absolute;
+            top: 10%;
+            width: 800px;
+            height: 600px;
+            opacity: 0.15; /* Starts faint */
+            transition: opacity 0.5s ease;
+            z-index: 1;
+            pointer-events: none;
         }
 
-        /* Pity Bar Styles */
-        .pity-container {
-            width: 300px;
-            background: #222;
-            border: 2px solid var(--neon-cyan);
-            border-radius: 10px;
+        .stand-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        /* Pity Bar (Luck Meter) */
+        .pity-wrapper {
+            z-index: 10;
+            width: 400px;
+            text-align: center;
             margin-bottom: 20px;
-            overflow: hidden;
-            box-shadow: 0 0 10px rgba(0, 243, 255, 0.3);
-        }
-
-        #pity-bar {
-            height: 20px;
-            width: 0%;
-            background: linear-gradient(90deg, var(--neon-cyan), var(--neon-green));
-            transition: width 0.3s ease;
         }
 
         .pity-label {
-            font-size: 0.8rem;
             color: var(--neon-cyan);
-            margin-bottom: 5px;
+            font-weight: bold;
             text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 8px;
+            display: block;
         }
 
-        .machine-frame {
-            background: var(--dark-carbon);
-            padding: 25px;
-            border: 4px solid var(--neon-green);
+        .pity-bar-bg {
+            width: 100%;
+            height: 15px;
+            background: #222;
+            border: 2px solid var(--neon-cyan);
             border-radius: 20px;
-            box-shadow: 0 0 30px rgba(57, 255, 20, 0.2), inset 0 0 15px #000;
+            overflow: hidden;
+            box-shadow: 0 0 15px rgba(0, 243, 255, 0.4);
+        }
+
+        #pity-fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, var(--neon-cyan), var(--neon-green));
+            transition: width 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        /* Slot Machine Styles */
+        .machine-frame {
+            background: #111;
+            padding: 25px;
+            border: 6px solid var(--neon-green);
+            border-radius: 30px;
+            box-shadow: 0 0 40px var(--neon-green);
+            z-index: 5;
             position: relative;
         }
 
         .reels-container {
             display: flex;
-            gap: 15px;
+            gap: 20px;
             background: #000;
             padding: 15px;
-            border-radius: 10px;
-            border: 2px solid #333;
+            border-radius: 15px;
+            border: 3px solid #333;
         }
 
         .reel {
             width: 140px;
             height: 200px;
-            background: #111;
+            background: #050505;
             overflow: hidden;
             position: relative;
-            border: 1px solid #222;
+            border-radius: 10px;
         }
 
-        .reel-strip { position: absolute; top: 0; left: 0; width: 100%; }
         .reel-strip img { width: 140px; height: 200px; display: block; object-fit: contain; }
 
-        .controls { margin-top: 30px; text-align: center; }
-        
+        .controls { margin-top: 30px; text-align: center; z-index: 10; }
+
         #status { 
             height: 1.5em; 
-            color: var(--neon-green); 
-            font-size: 2rem; 
-            text-shadow: 0 0 10px var(--neon-green);
+            color: white; 
+            font-size: 2.2rem; 
+            text-shadow: 0 0 10px var(--neon-purple);
             margin-bottom: 20px;
+            font-weight: bold;
         }
 
         #spin-btn {
-            background: transparent;
+            background: black;
             color: var(--neon-green);
-            padding: 15px 60px;
+            padding: 20px 80px;
             font-size: 2rem;
             font-weight: bold;
-            border: 3px solid var(--neon-green);
-            border-radius: 5px;
+            border: 4px solid var(--neon-green);
+            border-radius: 15px;
             cursor: pointer;
-            transition: 0.2s;
+            transition: 0.3s;
             text-transform: uppercase;
+            box-shadow: 0 0 15px var(--neon-green);
         }
 
         #spin-btn:hover {
             background: var(--neon-green);
             color: black;
-            box-shadow: 0 0 20px var(--neon-green);
+            box-shadow: 0 0 30px var(--neon-green);
         }
 
-        #spin-btn:disabled { opacity: 0.3; filter: grayscale(1); }
-
+        #spin-btn:disabled { opacity: 0.2; cursor: wait; }
     </style>
 </head>
 <body>
 
-    <p class="menacing">MENACING...</p>
-    <h1>STARDUST CARDS</h1>
+    <div class="stand-container" id="stand-visual">
+        <img src="stand.png" alt="">
+    </div>
 
-    <div class="pity-label">Luck Meter (Guaranteed Jackpot)</div>
-    <div class="pity-container">
-        <div id="pity-bar"></div>
+    <div class="casino-header">
+        <h1>STARDUST CASINO</h1>
+    </div>
+
+    <div class="pity-wrapper">
+        <span class="pity-label">Stand Luck: <span id="pity-count">0</span>/10</span>
+        <div class="pity-bar-bg">
+            <div id="pity-fill"></div>
+        </div>
     </div>
     
     <div class="machine-frame">
@@ -151,13 +191,12 @@
     </div>
 
     <div class="controls">
-        <h2 id="status">PRESS START</h2>
+        <h2 id="status">GO AHEAD, MISTER JOESTAR</h2>
         <button id="spin-btn">SPIN</button>
     </div>
 
 <script>
-    // --- SETTINGS YOU CAN EDIT ---
-    const pityLimit = 10; // Number of misses until a forced Jackpot
+    const pityLimit = 10; // Change this to make it harder or easier
     let currentMisses = 0;
 
     const symbols = [
@@ -169,17 +208,15 @@
     ];
 
     const payouts = [
-        { symId: "Death", count: 1, message: "BACKLASH" },
-        { symId: "Death", count: 2, message: "I LOST THE HOUSE" },
-        { symId: "Death", count: 3, message: "NO STAND FOR YOU" },
+        { symId: "Death", count: 3, message: "NO STAND FOR YOU (JACKPOT)" },
         { symId: "Ace", count: 3, message: "LEGENDARY JACKPOT" },
-        { symId: "Ace", count: 2, message: "Ace in the sleeve" },
         { symId: "King", count: 3, message: "VERY RARE JACKPOT" },
-        { symId: "King", count: 2, message: "Kings crown" },
         { symId: "Queen", count: 3, message: "RARE JACKPOT" },
-        { symId: "Queen", count: 2, message: "Queens pawn" },
         { symId: "Jack", count: 3, message: "UNCOMMON JACKPOT" },
-        { symId: "Jack", count: 2, message: "Jack of All trades" }
+        // These are minor wins, they WON'T reset pity
+        { symId: "Ace", count: 2, message: "Ace in the sleeve" },
+        { symId: "Death", count: 2, message: "I LOST THE HOUSE" },
+        { symId: "Death", count: 1, message: "BACKLASH" }
     ];
 
     const strips = [document.getElementById('strip1'), document.getElementById('strip2'), document.getElementById('strip3')];
@@ -194,7 +231,6 @@
                     strip.appendChild(img);
                 });
             }
-            strip.style.top = '0px';
         });
     }
 
@@ -207,56 +243,69 @@
         }
     }
 
-    function updatePityBar() {
+    function updatePityUI() {
         const percent = (currentMisses / pityLimit) * 100;
-        document.getElementById('pity-bar').style.width = percent + "%";
+        document.getElementById('pity-fill').style.width = percent + "%";
+        document.getElementById('pity-count').innerText = currentMisses;
+        
+        // Make the stand character more visible as pity rises
+        const stand = document.getElementById('stand-visual');
+        stand.style.opacity = 0.15 + (percent / 150);
     }
 
     document.getElementById('spin-btn').addEventListener('click', () => {
         const btn = document.getElementById('spin-btn');
         btn.disabled = true;
-        document.getElementById('status').innerText = "ROLLING...";
+        document.getElementById('status').innerText = "SPINNING...";
         strips.forEach(s => { s.style.transition = 'none'; s.style.top = '0px'; });
 
         setTimeout(() => {
             let results;
             
-            // CHECK FOR PITY TRIGGER
+            // PITY TRIGGER: Force a 3x Jackpot
             if (currentMisses >= pityLimit) {
-                // FORCE 3 OF A KIND (Excluding Death)
-                const luckyCard = symbols[Math.floor(Math.random() * 4)]; // 0 to 3 (J, Q, K, A)
+                const luckyCard = symbols[Math.floor(Math.random() * symbols.length)];
                 results = [luckyCard, luckyCard, luckyCard];
-                currentMisses = 0;
             } else {
                 results = [weightedRandom(), weightedRandom(), weightedRandom()];
             }
 
             strips.forEach((strip, i) => {
                 const symbolIndex = symbols.findIndex(s => s.id === results[i].id);
-                const finalPosition = -((20 * symbols.length * 200) + (symbolIndex * 200));
-                strip.style.transition = `top ${2 + (i * 0.5)}s cubic-bezier(0.1, 0, 0.1, 1)`;
-                strip.style.top = `${finalPosition}px`;
+                const finalPos = -((25 * symbols.length * 200) + (symbolIndex * 200));
+                strip.style.transition = `top ${2 + (i * 0.4)}s cubic-bezier(0.1, 0, 0, 1)`;
+                strip.style.top = `${finalPos}px`;
             });
 
             setTimeout(() => { 
                 checkWinner(results); 
                 btn.disabled = false;
-                updatePityBar();
-            }, 3500);
+                updatePityUI();
+            }, 3200);
         }, 50);
     });
 
     function checkWinner(results) {
         const counts = {};
         results.forEach(r => { counts[r.id] = (counts[r.id] || 0) + 1; });
-        const winRule = payouts.find(p => counts[p.symId] >= p.count);
         
+        // Check for ANY 3-of-a-kind (The true Jackpots)
+        let isTrueJackpot = false;
+        const winRule = payouts.find(p => counts[p.symId] >= p.count);
+
         if (winRule) {
             document.getElementById('status').innerText = winRule.message;
-            // Reset misses if they got a 3-of-a-kind jackpot naturally
-            if (winRule.count === 3) currentMisses = 0; 
+            if (winRule.count === 3) {
+                isTrueJackpot = true;
+                currentMisses = 0; // RESET ON ANY JACKPOT
+                document.getElementById('status').style.color = "var(--neon-green)";
+            } else {
+                currentMisses++; // 2x wins don't reset pity
+                document.getElementById('status').style.color = "white";
+            }
         } else {
-            document.getElementById('status').innerText = "Nothing Special...";
+            document.getElementById('status').innerText = "NOTHING SPECIAL...";
+            document.getElementById('status').style.color = "white";
             currentMisses++;
         }
     }
