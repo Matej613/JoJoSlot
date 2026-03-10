@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EVERY1ISAWINNER</title>
+    <title>STARDUST CASINO: DUAL DEATH</title>
     <style>
         :root {
             --neon-purple: #9d00ff;
             --neon-gold: #ffd700;
-            --neon-pink: #ff00ff;
+            --neon-red: #ff0000;
             --bg-dark: #0a0510;
         }
 
@@ -17,41 +17,46 @@
             background-image: radial-gradient(circle at 50% 50%, #1a0a2e 0%, var(--bg-dark) 100%);
             color: white;
             font-family: 'Segoe UI', Impact, sans-serif;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            margin: 0;
-            min-height: 100vh;
+            display: flex; flex-direction: column; align-items: center;
+            margin: 0; min-height: 100vh; overflow-x: hidden;
         }
 
         h1 {
             color: white;
             text-shadow: 0 0 15px var(--neon-purple);
-            font-size: 3.5rem;
-            margin: 30px 0 10px;
-            letter-spacing: 12px;
-            font-style: italic;
+            font-size: 3.5rem; margin: 30px 0 10px;
+            letter-spacing: 12px; font-style: italic;
         }
 
+        /* Pity Bar with Glow Effect */
         .pity-container { width: 350px; margin-bottom: 30px; text-align: center; }
-        .pity-bar { width: 100%; height: 10px; background: #000; border: 1px solid var(--neon-purple); border-radius: 5px; overflow: hidden; }
+        .pity-bar { width: 100%; height: 12px; background: #000; border: 1px solid var(--neon-purple); border-radius: 5px; overflow: hidden; position: relative; }
         #pity-fill { height: 100%; width: 0%; background: var(--neon-purple); box-shadow: 0 0 15px var(--neon-purple); transition: width 0.4s; }
+        
+        /* Flash when pity is full */
+        .pity-full { animation: pity-pulse 0.5s infinite alternate; border-color: white !important; }
+        @keyframes pity-pulse { from { box-shadow: 0 0 5px var(--neon-purple); } to { box-shadow: 0 0 20px white; } }
 
         .machine {
-            background: #120a1d;
-            padding: 25px;
-            border: 4px solid var(--neon-purple);
-            border-radius: 20px;
-            box-shadow: 0 0 40px rgba(157, 0, 255, 0.3);
-            transition: 0.3s;
+            background: #120a1d; padding: 25px; border: 4px solid var(--neon-purple);
+            border-radius: 20px; box-shadow: 0 0 40px rgba(157, 0, 255, 0.3);
+            transition: 0.3s; position: relative; z-index: 10;
         }
 
+        /* Win Visual Effects */
         .jackpot-glow { 
             animation: jackpot-flash 0.3s infinite alternate; 
             border-color: var(--neon-gold) !important;
             box-shadow: 0 0 60px var(--neon-gold) !important;
         }
         @keyframes jackpot-flash { to { filter: brightness(1.8); transform: scale(1.02); } }
+
+        .death-void {
+            animation: void-flash 0.1s infinite;
+            border-color: var(--neon-red) !important;
+            box-shadow: 0 0 80px var(--neon-red) !important;
+        }
+        @keyframes void-flash { 0% { background: #000; } 100% { background: #400; } }
 
         .reels { display: flex; gap: 15px; background: #000; padding: 12px; border-radius: 10px; }
         .reel { width: 140px; height: 200px; background: #050505; overflow: hidden; position: relative; border: 1px solid #222; }
@@ -62,27 +67,26 @@
         #status { height: 1.5em; font-size: 1.8rem; color: white; margin-bottom: 20px; font-weight: bold; }
 
         button {
-            background: transparent;
-            color: white;
-            border: 2px solid var(--neon-purple);
-            padding: 15px 60px;
-            font-size: 1.8rem;
-            font-weight: bold;
-            cursor: pointer;
-            border-radius: 50px;
-            text-transform: uppercase;
-            transition: 0.3s;
+            background: transparent; color: white; border: 2px solid var(--neon-purple);
+            padding: 15px 80px; font-size: 1.8rem; font-weight: bold;
+            cursor: pointer; border-radius: 50px; text-transform: uppercase; transition: 0.3s;
         }
         button:hover:not(:disabled) { background: var(--neon-purple); box-shadow: 0 0 30px var(--neon-purple); }
         button:disabled { opacity: 0.2; }
+
+        .shake-heavy { animation: shake-vibe 0.05s infinite; }
+        @keyframes shake-vibe {
+            0% { transform: translate(3px, 3px); }
+            100% { transform: translate(-3px, -3px); }
+        }
     </style>
 </head>
 <body>
 
-    <h1>EVERY1</h1>
+    <h1>STARDUST</h1>
 
     <div class="pity-container">
-        <div class="pity-bar"><div id="pity-fill"></div></div>
+        <div class="pity-bar" id="pity-frame"><div id="pity-fill"></div></div>
     </div>
 
     <div class="machine" id="machine-body">
@@ -99,40 +103,31 @@
     </div>
 
 <script>
-    // --- ADVANCED AUDIO ENGINE ---
+    // --- AUDIO SYSTEM ---
     const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-
-    function playNote(freq, type, start, duration, vol = 0.1) {
+    
+    function playInternalClick() {
         const osc = audioCtx.createOscillator();
         const gain = audioCtx.createGain();
-        osc.type = type;
-        osc.frequency.setValueAtTime(freq, audioCtx.currentTime + start);
-        gain.gain.setValueAtTime(vol, audioCtx.currentTime + start);
-        gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + start + duration);
-        osc.connect(gain);
-        gain.connect(audioCtx.destination);
-        osc.start(audioCtx.currentTime + start);
-        osc.stop(audioCtx.currentTime + start + duration);
+        osc.type = 'sine'; osc.frequency.setValueAtTime(150, audioCtx.currentTime);
+        gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 0.05);
+        osc.connect(gain); gain.connect(audioCtx.destination);
+        osc.start(); osc.stop(audioCtx.currentTime + 0.05);
     }
 
-    // Sound Effects Library
-    const sounds = {
-        click: () => playNote(150, 'sine', 0, 0.05, 0.3), // Reel stop
-        pair: () => { // 2 of a kind
-            playNote(523.25, 'triangle', 0, 0.2); 
-            playNote(659.25, 'triangle', 0.1, 0.3);
-        },
-        jackpot: () => { // Standard 3-of-a-kind
-            [523, 659, 783, 1046].forEach((f, i) => playNote(f, 'square', i * 0.1, 0.4, 0.05));
-        },
-        legendary: () => { // Ace Jackpot
-            for(let i=0; i<8; i++) playNote(523 + (i*100), 'sawtooth', i * 0.1, 0.5, 0.03);
-        },
-        death: () => { // Backlash / Death
-            playNote(100, 'sawtooth', 0, 0.5, 0.2);
-            playNote(110, 'sawtooth', 0.1, 0.5, 0.2);
-        }
-    };
+    const sndPair = new Audio('pair.mp3');
+    const sndJack = new Audio('jack_win.mp3');
+    const sndQueen = new Audio('queen_win.mp3');
+    const sndKing = new Audio('king_win.mp3');
+    const sndLegendary = new Audio('legendary.mp3');
+    const sndDeathWarn = new Audio('death_warning.mp3'); // For 1x and 2x
+    const sndDeathFinal = new Audio('death_final.mp3');     // For 3x Jackpot
+
+    function play(sound) {
+        sound.currentTime = 0;
+        sound.play().catch(() => {});
+    }
 
     // --- GAME LOGIC ---
     const symbols = [
@@ -153,20 +148,10 @@
             for(let i=0; i<60; i++) {
                 symbols.forEach(s => {
                     const img = document.createElement('img');
-                    img.src = s.url;
-                    strip.appendChild(img);
+                    img.src = s.url; strip.appendChild(img);
                 });
             }
         });
-    }
-
-    function weightedRandom() {
-        let total = symbols.reduce((s, item) => s + item.weight, 0);
-        let r = Math.random() * total;
-        for (let s of symbols) {
-            if (r < s.weight) return s;
-            r -= s.weight;
-        }
     }
 
     document.getElementById('spin-btn').addEventListener('click', function() {
@@ -177,13 +162,14 @@
         
         status.innerText = "ROLLING...";
         status.style.color = "white";
-        machine.classList.remove('jackpot-glow');
+        machine.classList.remove('jackpot-glow', 'death-void', 'shake-heavy');
         
         strips.forEach(s => { s.style.transition = 'none'; s.style.top = '0px'; });
 
         setTimeout(() => {
             let results;
             if (currentMisses >= pityLimit) {
+                // Guaranteed Jackpot (Any of the 5 symbols)
                 const win = symbols[Math.floor(Math.random() * 5)];
                 results = [win, win, win];
             } else {
@@ -192,56 +178,79 @@
 
             strips.forEach((strip, i) => {
                 const symbolIndex = symbols.findIndex(s => s.id === results[i].id);
-                const moveAmount = ((50 * symbols.length) + symbolIndex) * 200;
                 const duration = 2 + (i * 0.5);
                 strip.style.transition = `top ${duration}s cubic-bezier(0.1, 0, 0.1, 1)`;
-                strip.style.top = `-${moveAmount}px`;
-
-                // CLICK SOUND ON STOP
-                setTimeout(() => sounds.click(), duration * 1000);
+                strip.style.top = `-${((50 * symbols.length) + symbolIndex) * 200}px`;
+                setTimeout(() => playInternalClick(), duration * 1000);
             });
 
-            // Wait for final reel to stop before calculating win
             setTimeout(() => {
                 const counts = {};
                 results.forEach(r => counts[r.id] = (counts[r.id] || 0) + 1);
                 
-                let msg = "Nothing Special...";
-                let isJackpot = false;
-
                 const jackpot = symbols.find(s => counts[s.id] === 3);
+                
                 if (jackpot) {
-                    isJackpot = true;
                     currentMisses = 0;
-                    machine.classList.add('jackpot-glow');
-                    status.style.color = "var(--neon-gold)";
-                    
-                    if (jackpot.id === "Ace") { msg = "LEGENDARY JACKPOT"; sounds.legendary(); }
-                    else if (jackpot.id === "Death") { msg = "NO STAND FOR YOU"; sounds.death(); }
-                    else { msg = jackpot.id.toUpperCase() + " JACKPOT"; sounds.jackpot(); }
+                    if (jackpot.id === "Death") {
+                        status.innerText = "NO STAND FOR YOU";
+                        status.style.color = var(--neon-red);
+                        machine.classList.add('death-void', 'shake-heavy');
+                        play(sndDeathFinal);
+                    } else {
+                        machine.classList.add('jackpot-glow');
+                        status.style.color = "var(--neon-gold)";
+                        if (jackpot.id === "Ace") { status.innerText = "LEGENDARY JACKPOT"; play(sndLegendary); }
+                        else if (jackpot.id === "King") { status.innerText = "KING JACKPOT"; play(sndKing); }
+                        else if (jackpot.id === "Queen") { status.innerText = "QUEEN JACKPOT"; play(sndQueen); }
+                        else { status.innerText = "JACK JACKPOT"; play(sndJack); }
+                    }
                 } 
                 else if (counts["Death"] >= 1) {
-                    msg = counts["Death"] === 2 ? "I LOST THE HOUSE" : "BACKLASH";
+                    status.innerText = counts["Death"] === 2 ? "I LOST THE HOUSE" : "BACKLASH";
                     status.style.color = "#ff4444";
-                    sounds.death();
+                    play(sndDeathWarn);
                     currentMisses++;
                 } 
                 else {
                     const pair = symbols.find(s => counts[s.id] === 2);
                     if (pair) {
-                        msg = pair.id === "Ace" ? "Ace in the sleeve" : pair.id + " Pair";
+                        status.innerText = pair.id + " Pair";
                         status.style.color = "var(--neon-purple)";
-                        sounds.pair();
+                        play(sndPair);
+                    } else {
+                        status.innerText = "Nothing Special...";
                     }
                     currentMisses++;
                 }
 
-                status.innerText = msg;
-                document.getElementById('pity-fill').style.width = (Math.min(currentMisses/pityLimit, 1)*100) + "%";
+                updatePity();
                 this.disabled = false;
             }, 3200);
         }, 50);
     });
+
+    function updatePity() {
+        const fill = document.getElementById('pity-fill');
+        const frame = document.getElementById('pity-frame');
+        const percent = (Math.min(currentMisses/pityLimit, 1)*100);
+        fill.style.width = percent + "%";
+        
+        if (currentMisses >= pityLimit) {
+            frame.classList.add('pity-full');
+        } else {
+            frame.classList.remove('pity-full');
+        }
+    }
+
+    function weightedRandom() {
+        let total = symbols.reduce((s, item) => s + item.weight, 0);
+        let r = Math.random() * total;
+        for (let s of symbols) {
+            if (r < s.weight) return s;
+            r -= s.weight;
+        }
+    }
 
     init();
 </script>
