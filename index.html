@@ -132,13 +132,31 @@ const IMAGES = {
   A: "ace.png",
   D: "death.png",
 };
-const SYMBOLS = ['J','Q','K','A','D'];
+  const WEIGHTS = {
+  J: 7,
+  Q: 6,
+  K: 5,
+  A: 4,
+  D: 3
+};
+
+const SYMBOLS = Object.keys(WEIGHTS);
+
+function randSym() {
+  const totalWeight = Object.values(WEIGHTS).reduce((a,b) => a+b, 0);
+  let rand = Math.random() * totalWeight;
+
+  for (const sym of SYMBOLS) {
+    if (rand < WEIGHTS[sym]) {
+      return sym;
+    }
+    rand -= WEIGHTS[sym];
+  }
+}
 const CARD_H = 190;
 const STRIP_LEN = 30;
 let rollCount = 0, meterCount = 0, isSpinning = false;
 let reelStrips = [[],[],[]], finalSymbols = ['J','J','J'];
-
-function randSym() { return SYMBOLS[Math.floor(Math.random()*SYMBOLS.length)]; }
 
 function createReelDOM(reelIdx, strip) {
   const inner = document.getElementById('reel-inner-'+reelIdx);
