@@ -1,252 +1,730 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>STARDUST CASINO: REPAIRED</title>
-    <style>
-        :root {
-            --neon-purple: #9d00ff;
-            --neon-gold: #ffd700;
-            --neon-red: #ff0000;
-            --bg-dark: #0a0510;
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GOLDEN WIND SLOTS</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700;900&family=Cinzel:wght@400;600;900&display=swap');
 
-        body {
-            background-color: var(--bg-dark);
-            background-image: radial-gradient(circle at 50% 50%, #1a0a2e 0%, var(--bg-dark) 100%);
-            color: white;
-            font-family: 'Segoe UI', Impact, sans-serif;
-            display: flex; flex-direction: column; align-items: center;
-            margin: 0; min-height: 100vh; overflow-x: hidden;
-        }
+  :root {
+    --gold: #c9a84c;
+    --gold-light: #f0d080;
+    --gold-dark: #7a5c1e;
+    --purple: #4a1a6e;
+    --purple-dark: #1e0a30;
+    --purple-light: #8b3aba;
+    --crimson: #8b1a2a;
+    --bg: #0d0410;
+    --text-glow: 0 0 10px #c9a84c, 0 0 20px #c9a84c, 0 0 40px #c9a84c88;
+    --card-w: 120px;
+    --card-h: 190px;
+  }
 
-        h1 {
-            color: white;
-            text-shadow: 0 0 15px var(--neon-purple);
-            font-size: 3.5rem; margin: 30px 0 10px;
-            letter-spacing: 12px; font-style: italic;
-        }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
 
-        .pity-container { width: 350px; margin-bottom: 30px; text-align: center; }
-        .pity-bar { width: 100%; height: 12px; background: #000; border: 1px solid var(--neon-purple); border-radius: 5px; overflow: hidden; position: relative; }
-        #pity-fill { height: 100%; width: 0%; background: var(--neon-purple); box-shadow: 0 0 15px var(--neon-purple); transition: width 0.4s; }
-        
-        .pity-full { animation: pity-pulse 0.5s infinite alternate; border-color: white !important; }
-        @keyframes pity-pulse { from { box-shadow: 0 0 5px var(--neon-purple); } to { box-shadow: 0 0 20px white; } }
+  body {
+    background: var(--bg);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Cinzel', serif;
+    overflow: hidden;
+    position: relative;
+  }
 
-        .machine {
-            background: #120a1d; padding: 25px; border: 4px solid var(--neon-purple);
-            border-radius: 20px; box-shadow: 0 0 40px rgba(157, 0, 255, 0.3);
-            transition: 0.3s; position: relative; z-index: 10;
-        }
+  /* Animated diamond pattern background */
+  body::before {
+    content: '';
+    position: fixed; inset: 0;
+    background-image:
+      repeating-linear-gradient(45deg, transparent, transparent 30px, rgba(74,26,110,0.15) 30px, rgba(74,26,110,0.15) 60px),
+      repeating-linear-gradient(-45deg, transparent, transparent 30px, rgba(201,168,76,0.06) 30px, rgba(201,168,76,0.06) 60px);
+    animation: bgShift 20s linear infinite;
+    pointer-events: none;
+  }
 
-        .jackpot-glow { animation: jackpot-flash 0.3s infinite alternate; border-color: var(--neon-gold) !important; box-shadow: 0 0 60px var(--neon-gold) !important; }
-        @keyframes jackpot-flash { to { filter: brightness(1.8); transform: scale(1.02); } }
+  @keyframes bgShift { from { background-position: 0 0, 0 0; } to { background-position: 120px 120px, -120px 120px; } }
 
-        .death-void { animation: void-flash 0.1s infinite; border-color: var(--neon-red) !important; box-shadow: 0 0 80px var(--neon-red) !important; }
-        @keyframes void-flash { 0% { background: #000; } 100% { background: #400; } }
+  /* Corner ornaments */
+  .corner { position: fixed; width: 120px; height: 120px; opacity: 0.4; }
+  .corner svg { width: 100%; height: 100%; }
+  .corner-tl { top: 0; left: 0; }
+  .corner-tr { top: 0; right: 0; transform: scaleX(-1); }
+  .corner-bl { bottom: 0; left: 0; transform: scaleY(-1); }
+  .corner-br { bottom: 0; right: 0; transform: scale(-1); }
 
-        .reels { display: flex; gap: 15px; background: #000; padding: 12px; border-radius: 10px; }
-        .reel { width: 140px; height: 200px; background: #050505; overflow: hidden; position: relative; border: 1px solid #222; }
-        .strip { position: absolute; top: 0; left: 0; width: 100%; }
-        .strip img { width: 140px; height: 200px; display: block; object-fit: contain; }
+  .machine {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 18px;
+    padding: 32px 40px 28px;
+    background: linear-gradient(160deg, #1a0828 0%, #0d0410 40%, #1a0828 100%);
+    border: 3px solid var(--gold);
+    box-shadow:
+      0 0 0 1px var(--gold-dark),
+      0 0 30px rgba(201,168,76,0.3),
+      inset 0 0 60px rgba(74,26,110,0.4),
+      0 20px 60px rgba(0,0,0,0.8);
+    border-radius: 4px;
+    z-index: 1;
+    min-width: 480px;
+  }
 
-        .controls { margin-top: 40px; text-align: center; }
-        #status { height: 1.5em; font-size: 1.8rem; color: white; margin-bottom: 20px; font-weight: bold; }
+  /* Gold ornamental border overlay */
+  .machine::before {
+    content: '';
+    position: absolute; inset: 6px;
+    border: 1px solid rgba(201,168,76,0.3);
+    pointer-events: none;
+    border-radius: 2px;
+  }
 
-        button {
-            background: transparent; color: white; border: 2px solid var(--neon-purple);
-            padding: 15px 80px; font-size: 1.8rem; font-weight: bold;
-            cursor: pointer; border-radius: 50px; text-transform: uppercase; transition: 0.3s;
-        }
-        button:hover:not(:disabled) { background: var(--neon-purple); box-shadow: 0 0 30px var(--neon-purple); }
-        button:disabled { opacity: 0.2; cursor: default; }
+  .title {
+    font-family: 'Cinzel Decorative', serif;
+    font-size: 26px;
+    font-weight: 900;
+    color: var(--gold-light);
+    text-shadow: var(--text-glow);
+    letter-spacing: 6px;
+    text-transform: uppercase;
+    text-align: center;
+    line-height: 1.1;
+  }
+  .title span { display: block; font-size: 13px; letter-spacing: 12px; color: var(--gold); margin-top: 2px; }
 
-        .shake-heavy { animation: shake-vibe 0.05s infinite; }
-        @keyframes shake-vibe { 0% { transform: translate(3px, 3px); } 100% { transform: translate(-3px, -3px); } }
-    </style>
+  /* Jackpot bar */
+  .jackpot-bar-wrap {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+  }
+  .jackpot-label {
+    font-size: 10px;
+    letter-spacing: 4px;
+    color: var(--gold);
+    text-transform: uppercase;
+    opacity: 0.7;
+  }
+  .jackpot-track {
+    width: 100%;
+    height: 14px;
+    background: rgba(0,0,0,0.5);
+    border: 1px solid var(--gold-dark);
+    border-radius: 2px;
+    overflow: hidden;
+    position: relative;
+  }
+  .jackpot-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--gold-dark), var(--gold), var(--gold-light), var(--gold));
+    background-size: 200% 100%;
+    animation: shimmer 2s linear infinite;
+    transition: width 0.4s cubic-bezier(0.34,1.56,0.64,1);
+    width: 0%;
+    position: relative;
+  }
+  .jackpot-fill::after {
+    content: '';
+    position: absolute; right: 0; top: 0; bottom: 0;
+    width: 20px;
+    background: linear-gradient(90deg, transparent, rgba(255,255,200,0.6));
+  }
+  @keyframes shimmer { from { background-position: 200% 0; } to { background-position: 0 0; } }
+
+  .jackpot-ticks {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    padding: 0 2px;
+  }
+  .jackpot-ticks span {
+    font-size: 8px;
+    color: rgba(201,168,76,0.4);
+    font-family: 'Cinzel', serif;
+  }
+
+  /* Reels */
+  .reels-frame {
+    background: rgba(0,0,0,0.6);
+    border: 2px solid var(--gold-dark);
+    border-radius: 3px;
+    padding: 10px;
+    position: relative;
+    box-shadow: inset 0 0 30px rgba(0,0,0,0.8), 0 0 20px rgba(201,168,76,0.15);
+  }
+
+  /* Animated scanline */
+  .reels-frame::after {
+    content: '';
+    position: absolute; left: 10px; right: 10px;
+    top: 50%; transform: translateY(-50%);
+    height: 2px;
+    background: linear-gradient(90deg, transparent, rgba(201,168,76,0.6), rgba(201,168,76,0.9), rgba(201,168,76,0.6), transparent);
+    pointer-events: none;
+    animation: scanPulse 2s ease-in-out infinite;
+  }
+  @keyframes scanPulse { 0%,100% { opacity: 0.3; } 50% { opacity: 0.9; } }
+
+  .reels {
+    display: flex;
+    gap: 10px;
+  }
+
+  .reel {
+    width: var(--card-w);
+    height: var(--card-h);
+    overflow: hidden;
+    position: relative;
+    background: #050208;
+    border: 1px solid rgba(201,168,76,0.2);
+  }
+
+  .reel-inner {
+    position: absolute;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    transition: transform 0.08s linear;
+  }
+
+  .reel-inner.spinning {
+    transition: none;
+  }
+
+  .reel-cell {
+    width: var(--card-w);
+    height: var(--card-h);
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .reel-cell img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  /* Side gradients on reels for depth */
+  .reels-frame::before {
+    content: '';
+    position: absolute; left: 10px; right: 10px; top: 10px; bottom: 10px;
+    background:
+      linear-gradient(to bottom, rgba(0,0,0,0.8) 0%, transparent 25%, transparent 75%, rgba(0,0,0,0.8) 100%);
+    pointer-events: none;
+    z-index: 2;
+  }
+
+  /* Controls */
+  .controls {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+  }
+
+  .spin-btn {
+    font-family: 'Cinzel Decorative', serif;
+    font-size: 18px;
+    font-weight: 700;
+    letter-spacing: 4px;
+    color: var(--bg);
+    background: linear-gradient(160deg, var(--gold-light) 0%, var(--gold) 40%, var(--gold-dark) 100%);
+    border: none;
+    padding: 14px 60px;
+    cursor: pointer;
+    clip-path: polygon(12px 0%, calc(100% - 12px) 0%, 100% 50%, calc(100% - 12px) 100%, 12px 100%, 0% 50%);
+    position: relative;
+    text-transform: uppercase;
+    transition: all 0.15s;
+    box-shadow: 0 4px 20px rgba(201,168,76,0.4);
+  }
+  .spin-btn:hover:not(:disabled) {
+    background: linear-gradient(160deg, #fff8d0 0%, var(--gold-light) 40%, var(--gold) 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 30px rgba(201,168,76,0.6);
+  }
+  .spin-btn:active:not(:disabled) {
+    transform: translateY(1px);
+    box-shadow: 0 2px 10px rgba(201,168,76,0.3);
+  }
+  .spin-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  /* Result message */
+  .result-area {
+    min-height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+  }
+
+  .result-msg {
+    font-family: 'Cinzel Decorative', serif;
+    font-size: 14px;
+    letter-spacing: 3px;
+    text-align: center;
+    padding: 8px 20px;
+    opacity: 0;
+    transform: translateY(6px);
+    transition: all 0.4s cubic-bezier(0.34,1.56,0.64,1);
+  }
+  .result-msg.show { opacity: 1; transform: translateY(0); }
+
+  .result-msg.win {
+    color: var(--gold-light);
+    text-shadow: var(--text-glow);
+    border: 1px solid rgba(201,168,76,0.5);
+    background: rgba(201,168,76,0.08);
+  }
+  .result-msg.jackpot {
+    color: #fff;
+    text-shadow: 0 0 10px #fff, 0 0 20px var(--gold-light), 0 0 40px var(--gold), 0 0 80px var(--gold);
+    border: 1px solid var(--gold-light);
+    background: rgba(201,168,76,0.15);
+    animation: jackpotPulse 0.5s ease-in-out infinite alternate;
+  }
+  @keyframes jackpotPulse {
+    from { box-shadow: 0 0 10px rgba(201,168,76,0.3); }
+    to { box-shadow: 0 0 30px rgba(201,168,76,0.8), 0 0 60px rgba(201,168,76,0.4); }
+  }
+  .result-msg.lose {
+    color: rgba(201,168,76,0.4);
+    font-size: 11px;
+  }
+
+  /* Roll counter */
+  .roll-info {
+    display: flex;
+    gap: 30px;
+    font-size: 10px;
+    letter-spacing: 3px;
+    color: rgba(201,168,76,0.5);
+    text-transform: uppercase;
+  }
+  .roll-info span { color: var(--gold); font-weight: 600; }
+
+  /* Win combos reference */
+  .combos {
+    width: 100%;
+    border-top: 1px solid rgba(201,168,76,0.2);
+    padding-top: 14px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 3px 20px;
+    font-size: 9px;
+    letter-spacing: 2px;
+    color: rgba(201,168,76,0.4);
+    text-transform: uppercase;
+  }
+  .combos .combo-title {
+    grid-column: 1/-1;
+    text-align: center;
+    color: rgba(201,168,76,0.6);
+    margin-bottom: 4px;
+    font-size: 8px;
+    letter-spacing: 4px;
+  }
+  .combos .combo-item { display: flex; gap: 6px; }
+  .combos .combo-item .sym { color: var(--gold); }
+
+  /* JACKPOT FLASH OVERLAY */
+  #jackpot-overlay {
+    position: fixed; inset: 0;
+    background: radial-gradient(ellipse at center, rgba(201,168,76,0.3) 0%, transparent 70%);
+    pointer-events: none;
+    opacity: 0;
+    z-index: 100;
+    transition: opacity 0.3s;
+  }
+  #jackpot-overlay.active { opacity: 1; animation: overlayFlash 0.4s ease-in-out 3; }
+  @keyframes overlayFlash { 0%,100% { opacity: 0; } 50% { opacity: 1; } }
+
+  /* Win line highlight */
+  .win-highlight {
+    position: absolute; inset: 0;
+    border: 3px solid var(--gold-light);
+    box-shadow: 0 0 20px var(--gold), inset 0 0 20px rgba(201,168,76,0.2);
+    pointer-events: none;
+    opacity: 0;
+    z-index: 10;
+    transition: opacity 0.3s;
+  }
+  .reels-frame.winning .win-highlight { opacity: 1; }
+
+  /* Insta jackpot badge */
+  .insta-badge {
+    position: absolute;
+    top: -12px;
+    right: -12px;
+    width: 40px;
+    height: 40px;
+    background: radial-gradient(circle, var(--gold-light), var(--gold));
+    border: 2px solid var(--gold-light);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 7px;
+    font-family: 'Cinzel Decorative', serif;
+    color: var(--bg);
+    font-weight: 900;
+    text-align: center;
+    line-height: 1.1;
+    letter-spacing: 0;
+    box-shadow: 0 0 15px var(--gold);
+    transform: scale(0);
+    transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1);
+    z-index: 20;
+    pointer-events: none;
+    text-transform: uppercase;
+  }
+  .insta-badge.ready { transform: scale(1); animation: badgePulse 1s ease-in-out infinite alternate; }
+  @keyframes badgePulse {
+    from { box-shadow: 0 0 10px var(--gold); transform: scale(1); }
+    to { box-shadow: 0 0 25px var(--gold), 0 0 40px rgba(201,168,76,0.5); transform: scale(1.1); }
+  }
+</style>
 </head>
 <body>
 
-    <h1>STARDUST</h1>
+<div class="corner corner-tl">
+  <svg viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M10 10 L50 10 Q60 10 60 20 L60 30 Q60 40 70 40 L110 40" stroke="#c9a84c" stroke-width="2" fill="none"/>
+    <path d="M10 10 L10 50 Q10 60 20 60 L30 60 Q40 60 40 70 L40 110" stroke="#c9a84c" stroke-width="2" fill="none"/>
+    <circle cx="10" cy="10" r="4" fill="#c9a84c"/>
+    <circle cx="60" cy="25" r="3" fill="none" stroke="#c9a84c" stroke-width="1.5"/>
+    <circle cx="25" cy="60" r="3" fill="none" stroke="#c9a84c" stroke-width="1.5"/>
+  </svg>
+</div>
+<div class="corner corner-tr"></div>
+<div class="corner corner-bl"></div>
+<div class="corner corner-br"></div>
+<div id="jackpot-overlay"></div>
 
-    <div class="pity-container">
-        <div class="pity-bar" id="pity-frame"><div id="pity-fill"></div></div>
-    </div>
+<div class="machine">
+  <div class="title">
+    Golden Wind
+    <span>Slots</span>
+  </div>
 
-    <div class="machine" id="machine-body">
-        <div class="reels">
-            <div class="reel"><div id="strip1" class="strip"></div></div>
-            <div class="reel"><div id="strip2" class="strip"></div></div>
-            <div class="reel"><div id="strip3" class="strip"></div></div>
-        </div>
+  <div class="jackpot-bar-wrap">
+    <div class="jackpot-label">Insta-Jackpot Meter</div>
+    <div class="jackpot-track">
+      <div class="jackpot-fill" id="jackpot-fill"></div>
     </div>
+    <div class="jackpot-ticks">
+      <span>0</span><span>2</span><span>4</span><span>6</span><span>8</span><span>10</span>
+    </div>
+  </div>
 
-    <div class="controls">
-        <div id="status">READY TO SPIN</div>
-        <button id="spin-btn">SPIN</button>
+  <div class="reels-frame" id="reels-frame">
+    <div class="win-highlight"></div>
+    <div class="reels" id="reels">
+      <div class="reel" id="reel-0"><div class="reel-inner" id="reel-inner-0"></div></div>
+      <div class="reel" id="reel-1"><div class="reel-inner" id="reel-inner-1"></div></div>
+      <div class="reel" id="reel-2"><div class="reel-inner" id="reel-inner-2"></div></div>
     </div>
+    <div class="insta-badge" id="insta-badge">NEXT<br>SPIN!</div>
+  </div>
+
+  <div class="result-area">
+    <div class="result-msg" id="result-msg">— Fate awaits your spin —</div>
+  </div>
+
+  <div class="controls">
+    <button class="spin-btn" id="spin-btn" onclick="spin()">SPIN</button>
+    <div class="roll-info">
+      Rolls: <span id="roll-count">0</span>
+      &nbsp;|&nbsp;
+      Until Insta-Jackpot: <span id="rolls-until">10</span>
+    </div>
+  </div>
+
+  <div class="combos">
+    <div class="combo-title">— Winning Combinations —</div>
+    <div class="combo-item"><span class="sym">J+J+J</span><span>Jackpot</span></div>
+    <div class="combo-item"><span class="sym">Q+Q+Q</span><span>Jackpot</span></div>
+    <div class="combo-item"><span class="sym">K+K+K</span><span>Jackpot</span></div>
+    <div class="combo-item"><span class="sym">A+A+A</span><span>Jackpot</span></div>
+    <div class="combo-item"><span class="sym">D+D+D</span><span>Jackpot</span></div>
+    <div class="combo-item"><span class="sym">X+J+J</span><span>Win</span></div>
+    <div class="combo-item"><span class="sym">X+Q+Q</span><span>Win</span></div>
+    <div class="combo-item"><span class="sym">X+K+K</span><span>Win</span></div>
+    <div class="combo-item"><span class="sym">X+A+A</span><span>Win</span></div>
+    <div class="combo-item"><span class="sym">X+X+D</span><span>Win</span></div>
+    <div class="combo-item"><span class="sym">X+D+D</span><span>Win</span></div>
+    <div class="combo-item"><span class="sym">X+X+X</span><span>Win</span></div>
+  </div>
+</div>
 
 <script>
-    // Audio Context Setup
-    let audioCtx;
-    function initAudio() {
-        if (!audioCtx) {
-            audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+// Image paths — using uploaded files
+const IMAGES = {
+  J: '/mnt/user-data/uploads/jack.png',
+  Q: '/mnt/user-data/uploads/queen.png',
+  K: '/mnt/user-data/uploads/king.png',
+  A: '/mnt/user-data/uploads/ace.png',
+  D: '/mnt/user-data/uploads/death.png',
+};
+const SYMBOLS = ['J','Q','K','A','D'];
+const CARD_H = 190;
+const STRIP_LEN = 30; // how many symbols per reel strip
+
+let rollCount = 0;
+let meterCount = 0; // 0-9, jackpot triggers at 10
+let isSpinning = false;
+let reelStrips = [[],[],[]]; // symbol arrays for each reel
+let currentPositions = [0,0,0]; // current top index for each reel
+let finalSymbols = ['J','J','J'];
+
+function randSym() {
+  return SYMBOLS[Math.floor(Math.random() * SYMBOLS.length)];
+}
+
+function buildReelStrip(reel, n) {
+  const strip = [];
+  for (let i = 0; i < n; i++) strip.push(randSym());
+  return strip;
+}
+
+function createReelDOM(reelIdx, strip) {
+  const inner = document.getElementById('reel-inner-' + reelIdx);
+  inner.innerHTML = '';
+  strip.forEach(sym => {
+    const cell = document.createElement('div');
+    cell.className = 'reel-cell';
+    const img = document.createElement('img');
+    img.src = IMAGES[sym];
+    img.alt = sym;
+    img.draggable = false;
+    cell.appendChild(img);
+    inner.appendChild(cell);
+  });
+}
+
+function initReels() {
+  for (let i = 0; i < 3; i++) {
+    reelStrips[i] = buildReelStrip(i, STRIP_LEN);
+    createReelDOM(i, reelStrips[i]);
+    setReelPosition(i, 0);
+  }
+}
+
+function setReelPosition(reelIdx, pos) {
+  const inner = document.getElementById('reel-inner-' + reelIdx);
+  inner.style.transform = `translateY(${-pos * CARD_H}px)`;
+}
+
+function getWinType(syms) {
+  // syms is array of 3 symbol chars
+  const sorted = [...syms].sort();
+  const counts = {};
+  syms.forEach(s => counts[s] = (counts[s]||0)+1);
+  
+  // Three of a kind (any) = jackpot
+  if (new Set(syms).size === 1) return 'jackpot';
+  
+  // All different: check XXX (three different non-death), XXD, XDD
+  const dCount = counts['D'] || 0;
+  
+  // XJJ, XQQ, XKK, XAA — two of same named symbol + one different
+  const nonD = syms.filter(s => s !== 'D');
+  const nonDCounts = {};
+  nonD.forEach(s => nonDCounts[s] = (nonDCounts[s]||0)+1);
+  
+  // XJJ etc: exactly two of a named symbol and one different
+  for (const sym of ['J','Q','K','A']) {
+    if (counts[sym] === 2 && (syms.some(s => s !== sym))) return 'win';
+  }
+  
+  // XXD: two different non-death symbols + one death
+  if (dCount === 1 && new Set(nonD).size === 2) return 'win';
+  
+  // XDD: two deaths + one other
+  if (dCount === 2) return 'win';
+  
+  // XXX: three all-different non-matching symbols (none matching, no death)
+  if (new Set(syms).size === 3 && dCount === 0) return 'win';
+  
+  return 'lose';
+}
+
+function getWinMessage(syms, winType) {
+  if (winType === 'jackpot') {
+    const names = { J: 'The Jack', Q: 'The Queen', K: 'The King', A: 'The Ace', D: 'Death' };
+    return `✦ JACKPOT — ${names[syms[0]]} ✦`;
+  }
+  if (winType === 'win') {
+    return '✧ Your destiny shines ✧';
+  }
+  const taunts = [
+    '— The stars were not aligned —',
+    '— Fate is a cruel mistress —',
+    '— The arrow has missed —',
+    '— Try again, mortal —',
+  ];
+  return taunts[Math.floor(Math.random() * taunts.length)];
+}
+
+function showResult(msg, type) {
+  const el = document.getElementById('result-msg');
+  el.className = 'result-msg';
+  void el.offsetWidth; // reflow
+  el.textContent = msg;
+  el.className = 'result-msg show ' + type;
+}
+
+function updateMeter() {
+  const pct = (meterCount / 10) * 100;
+  document.getElementById('jackpot-fill').style.width = pct + '%';
+  document.getElementById('rolls-until').textContent = Math.max(0, 10 - meterCount);
+  
+  const badge = document.getElementById('insta-badge');
+  if (meterCount >= 10) {
+    badge.classList.add('ready');
+  } else {
+    badge.classList.remove('ready');
+  }
+}
+
+function updateRollCount() {
+  document.getElementById('roll-count').textContent = rollCount;
+}
+
+async function spin() {
+  if (isSpinning) return;
+  isSpinning = true;
+  document.getElementById('spin-btn').disabled = true;
+  document.getElementById('reels-frame').classList.remove('winning');
+
+  // Hide result
+  document.getElementById('result-msg').classList.remove('show');
+
+  rollCount++;
+  meterCount++;
+  updateRollCount();
+
+  let forceJackpot = false;
+  if (meterCount >= 10) {
+    forceJackpot = true;
+  }
+
+  // Determine final symbols
+  let chosen;
+  if (forceJackpot) {
+    // Pick a random jackpot (three of a kind)
+    const sym = SYMBOLS[Math.floor(Math.random() * SYMBOLS.length)];
+    chosen = [sym, sym, sym];
+  } else {
+    chosen = [randSym(), randSym(), randSym()];
+  }
+  finalSymbols = chosen;
+
+  // Build new strip for each reel, ensure final symbol is at position STRIP_LEN-1
+  for (let i = 0; i < 3; i++) {
+    const strip = buildReelStrip(i, STRIP_LEN - 1);
+    strip.push(chosen[i]);
+    reelStrips[i] = strip;
+    createReelDOM(i, strip);
+    setReelPosition(i, 0);
+  }
+
+  // Animate spinning
+  const spinDurations = [1200, 1500, 1800]; // staggered stop times
+  const fps = 60;
+  const speeds = [3, 3, 3]; // cells per frame roughly
+  const startTimes = [null, null, null];
+  let stopped = [false, false, false];
+
+  await new Promise(resolve => {
+    let frame = 0;
+    const positions = [0, 0, 0];
+
+    function tick() {
+      frame++;
+      const now = Date.now();
+
+      for (let i = 0; i < 3; i++) {
+        if (stopped[i]) continue;
+        positions[i] += 0.25;
+        if (positions[i] >= STRIP_LEN - 1) positions[i] = STRIP_LEN - 1;
+
+        const elapsed = frame * (1000/60);
+        if (elapsed >= spinDurations[i]) {
+          positions[i] = STRIP_LEN - 1;
+          stopped[i] = true;
         }
+
+        setReelPosition(i, positions[i]);
+      }
+
+      if (stopped.every(Boolean)) {
+        resolve();
+      } else {
+        requestAnimationFrame(tick);
+      }
     }
+    requestAnimationFrame(tick);
+  });
 
-    // Built-in Click
-    function playInternalClick() {
-        if (!audioCtx) return;
-        const osc = audioCtx.createOscillator();
-        const gain = audioCtx.createGain();
-        osc.type = 'sine'; osc.frequency.setValueAtTime(150, audioCtx.currentTime);
-        gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
-        gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 0.05);
-        osc.connect(gain); gain.connect(audioCtx.destination);
-        osc.start(); osc.stop(audioCtx.currentTime + 0.05);
-    }
+  // Evaluate win
+  const winType = getWinType(chosen);
+  const msg = getWinMessage(chosen, winType);
 
-    // Custom MP3s - Ensure these exist in your folder!
-    const sndPair = new Audio('pair.mp3');
-    const sndJack = new Audio('jack_win.mp3');
-    const sndQueen = new Audio('queen_win.mp3');
-    const sndKing = new Audio('king_win.mp3');
-    const sndLegendary = new Audio('legendary.mp3');
-    const sndDeathWarn = new Audio('death_warning.mp3'); 
-    const sndDeathFinal = new Audio('death_final.mp3');     
+  if (winType === 'jackpot' || winType === 'win') {
+    document.getElementById('reels-frame').classList.add('winning');
+  }
 
-    function play(sound) {
-        sound.currentTime = 0;
-        sound.play().catch(() => {});
-    }
+  if (winType === 'jackpot') {
+    document.getElementById('jackpot-overlay').classList.add('active');
+    setTimeout(() => document.getElementById('jackpot-overlay').classList.remove('active'), 1300);
+  }
 
-    const symbols = [
-        { id: "Jack", url: "jack.png", weight: 6 },
-        { id: "Queen", url: "queen.png", weight: 5 },
-        { id: "King", url: "king.png", weight: 4 },
-        { id: "Ace", url: "ace.png", weight: 3 },
-        { id: "Death", url: "death.png", weight: 2 }
-    ];
+  if (forceJackpot) {
+    // Reset meter
+    meterCount = 0;
+    updateMeter();
+  } else {
+    updateMeter();
+  }
 
-    let currentMisses = 0;
-    const pityLimit = 10;
-    const strips = [document.getElementById('strip1'), document.getElementById('strip2'), document.getElementById('strip3')];
+  if (winType === 'jackpot') {
+    // Also reset meter on natural jackpot
+    meterCount = 0;
+    updateMeter();
+  }
 
-    // BUILD REELS ON LOAD
-    function buildReels() {
-        strips.forEach(strip => {
-            strip.innerHTML = '';
-            for(let i=0; i<60; i++) {
-                symbols.forEach(s => {
-                    const img = document.createElement('img');
-                    img.src = s.url; 
-                    strip.appendChild(img);
-                });
-            }
-        });
-    }
+  setTimeout(() => {
+    showResult(msg, winType);
+    isSpinning = false;
+    document.getElementById('spin-btn').disabled = false;
+  }, 200);
+}
 
-    function weightedRandom() {
-        let total = symbols.reduce((s, item) => s + item.weight, 0);
-        let r = Math.random() * total;
-        for (let s of symbols) {
-            if (r < s.weight) return s;
-            r -= s.weight;
-        }
-    }
+// Init
+initReels();
+updateMeter();
+updateRollCount();
 
-    document.getElementById('spin-btn').addEventListener('click', function() {
-        initAudio();
-        if (audioCtx.state === 'suspended') audioCtx.resume();
-
-        this.disabled = true;
-        const status = document.getElementById('status');
-        const machine = document.getElementById('machine-body');
-        
-        status.innerText = "ROLLING...";
-        status.style.color = "white";
-        machine.classList.remove('jackpot-glow', 'death-void', 'shake-heavy');
-        
-        strips.forEach(s => { s.style.transition = 'none'; s.style.top = '0px'; });
-
-        setTimeout(() => {
-            let results;
-            if (currentMisses >= pityLimit) {
-                const win = symbols[Math.floor(Math.random() * 5)];
-                results = [win, win, win];
-            } else {
-                results = [weightedRandom(), weightedRandom(), weightedRandom()];
-            }
-
-            strips.forEach((strip, i) => {
-                const symbolIndex = symbols.findIndex(s => s.id === results[i].id);
-                const duration = 2 + (i * 0.5);
-                strip.style.transition = `top ${duration}s cubic-bezier(0.1, 0, 0.1, 1)`;
-                strip.style.top = `-${((50 * symbols.length) + symbolIndex) * 200}px`;
-                setTimeout(() => playInternalClick(), duration * 1000);
-            });
-
-            setTimeout(() => {
-                const counts = {};
-                results.forEach(r => counts[r.id] = (counts[r.id] || 0) + 1);
-                
-                const jackpot = symbols.find(s => counts[s.id] === 3);
-                
-                if (jackpot) {
-                    currentMisses = 0;
-                    if (jackpot.id === "Death") {
-                        status.innerText = "NO STAND FOR YOU";
-                        status.style.color = "var(--neon-red)"; // Fixed Typo Here
-                        machine.classList.add('death-void', 'shake-heavy');
-                        play(sndDeathFinal);
-                    } else {
-                        machine.classList.add('jackpot-glow');
-                        status.style.color = "var(--neon-gold)";
-                        if (jackpot.id === "Ace") { status.innerText = "LEGENDARY JACKPOT"; play(sndLegendary); }
-                        else if (jackpot.id === "King") { status.innerText = "KING JACKPOT"; play(sndKing); }
-                        else if (jackpot.id === "Queen") { status.innerText = "QUEEN JACKPOT"; play(sndQueen); }
-                        else { status.innerText = "JACK JACKPOT"; play(sndJack); }
-                    }
-                } 
-                else if (counts["Death"] >= 1) {
-                    status.innerText = counts["Death"] === 2 ? "I LOST THE HOUSE" : "BACKLASH";
-                    status.style.color = "#ff4444";
-                    play(sndDeathWarn);
-                    currentMisses++;
-                } 
-                else {
-                    const pair = symbols.find(s => counts[s.id] === 2);
-                    if (pair) {
-                        status.innerText = pair.id + " Pair";
-                        status.style.color = "var(--neon-purple)";
-                        play(sndPair);
-                    } else {
-                        status.innerText = "Nothing Special...";
-                    }
-                    currentMisses++;
-                }
-
-                updatePity();
-                document.getElementById('spin-btn').disabled = false;
-            }, 3200);
-        }, 50);
-    });
-
-    function updatePity() {
-        const fill = document.getElementById('pity-fill');
-        const frame = document.getElementById('pity-frame');
-        const percent = (Math.min(currentMisses/pityLimit, 1)*100);
-        fill.style.width = percent + "%";
-        
-        if (currentMisses >= pityLimit) frame.classList.add('pity-full');
-        else frame.classList.remove('pity-full');
-    }
-
-    // Run build on start
-    window.onload = buildReels;
+// Show initial flavor text
+const el = document.getElementById('result-msg');
+el.textContent = '— Your fate awaits —';
+el.classList.add('show', 'lose');
 </script>
 </body>
 </html>
