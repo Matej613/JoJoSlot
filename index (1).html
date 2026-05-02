@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EVERY1 SLOTS</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700;900&family=Cinzel:wght@400;600;900&display=swap');
+  :root {
+    --gold: #c9a84c; --gold-light: #f0d080; --gold-dark: #7a5c1e;
+    --purple: #4a1a6e; --purple-dark: #1e0a30; --bg: #0d0410;
+    --text-glow: 0 0 10px #c9a84c, 0 0 20px #c9a84c, 0 0 40px #c9a84c88;
+    --card-w: 120px; --card-h: 190px;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    background: var(--bg); min-height:100vh; display:flex; flex-direction:column;
+    align-items:center; justify-content:center; font-family:'Cinzel',serif; overflow:hidden; position:relative;
+  }
+  body::before {
+    content:''; position:fixed; inset:0;
+    background-image: repeating-linear-gradient(45deg,transparent,transparent 30px,rgba(74,26,110,.15) 30px,rgba(74,26,110,.15) 60px), repeating-linear-gradient(-45deg,transparent,transparent 30px,rgba(201,168,76,.06) 30px,rgba(201,168,76,.06) 60px);
+    animation: bgShift 20s linear infinite; pointer-events:none;
+  }
+  @keyframes bgShift { from{background-position:0 0,0 0} to{background-position:120px 120px,-120px 120px} }
+  .corner { position:fixed; width:120px; height:120px; opacity:.4; }
+  .corner svg { width:100%; height:100%; }
+  .corner-tl{top:0;left:0} .corner-tr{top:0;right:0;transform:scaleX(-1)} .corner-bl{bottom:0;left:0;transform:scaleY(-1)} .corner-br{bottom:0;right:0;transform:scale(-1)}
+  .machine {
+    position:relative; display:flex; flex-direction:column; align-items:center; gap:16px;
+    padding:28px 36px 24px;
+    background:linear-gradient(160deg,#1a0828 0%,#0d0410 40%,#1a0828 100%);
+    border:3px solid var(--gold);
+    box-shadow:0 0 0 1px var(--gold-dark),0 0 30px rgba(201,168,76,.3),inset 0 0 60px rgba(74,26,110,.4),0 20px 60px rgba(0,0,0,.8);
+    border-radius:4px; z-index:1; min-width:460px;
+  }
+  .machine::before { content:''; position:absolute; inset:6px; border:1px solid rgba(201,168,76,.3); pointer-events:none; border-radius:2px; }
+  .title { font-family:'Cinzel Decorative',serif; font-size:26px; font-weight:900; color:var(--gold-light); text-shadow:var(--text-glow); letter-spacing:6px; text-transform:uppercase; text-align:center; line-height:1.1; }
+  .title span { display:block; font-size:13px; letter-spacing:12px; color:var(--gold); margin-top:2px; }
+  .jackpot-bar-wrap { width:100%; display:flex; flex-direction:column; align-items:center; gap:4px; }
+  .jackpot-label { font-size:10px; letter-spacing:4px; color:var(--gold); text-transform:uppercase; opacity:.7; }
+  .jackpot-track { width:100%; height:14px; background:rgba(0,0,0,.5); border:1px solid var(--gold-dark); border-radius:2px; overflow:hidden; }
+  .jackpot-fill { height:100%; background:linear-gradient(90deg,var(--gold-dark),var(--gold),var(--gold-light),var(--gold)); background-size:200% 100%; animation:shimmer 2s linear infinite; transition:width .4s cubic-bezier(.34,1.56,.64,1); width:0%; position:relative; }
+  .jackpot-fill::after { content:''; position:absolute; right:0; top:0; bottom:0; width:20px; background:linear-gradient(90deg,transparent,rgba(255,255,200,.6)); }
+  @keyframes shimmer { from{background-position:200% 0} to{background-position:0 0} }
+  .jackpot-ticks { width:100%; display:flex; justify-content:space-between; padding:0 2px; }
+  .jackpot-ticks span { font-size:8px; color:rgba(201,168,76,.4); font-family:'Cinzel',serif; }
+  .reels-frame { background:rgba(0,0,0,.6); border:2px solid var(--gold-dark); border-radius:3px; padding:10px; position:relative; box-shadow:inset 0 0 30px rgba(0,0,0,.8),0 0 20px rgba(201,168,76,.15); }
+  .reels-frame::after { content:''; position:absolute; left:10px; right:10px; top:50%; transform:translateY(-50%); height:2px; background:linear-gradient(90deg,transparent,rgba(201,168,76,.6),rgba(201,168,76,.9),rgba(201,168,76,.6),transparent); pointer-events:none; animation:scanPulse 2s ease-in-out infinite; }
+  @keyframes scanPulse { 0%,100%{opacity:.3} 50%{opacity:.9} }
+  .reels { display:flex; gap:10px; }
+  .reel { width:var(--card-w); height:var(--card-h); overflow:hidden; position:relative; background:#050208; border:1px solid rgba(201,168,76,.2); }
+  .reel-inner { position:absolute; width:100%; display:flex; flex-direction:column; }
+  .reel-cell { width:var(--card-w); height:var(--card-h); flex-shrink:0; }
+  .reel-cell img { width:100%; height:100%; object-fit:cover; display:block; }
+  .reels-frame::before { content:''; position:absolute; left:10px; right:10px; top:10px; bottom:10px; background:linear-gradient(to bottom,rgba(0,0,0,.8) 0%,transparent 25%,transparent 75%,rgba(0,0,0,.8) 100%); pointer-events:none; z-index:2; }
+  .result-area { min-height:48px; display:flex; align-items:center; justify-content:center; width:100%; }
+  .result-msg { font-family:'Cinzel Decorative',serif; font-size:14px; letter-spacing:3px; text-align:center; padding:8px 20px; opacity:0; transform:translateY(6px); transition:all .4s cubic-bezier(.34,1.56,.64,1); }
+  .result-msg.show { opacity:1; transform:translateY(0); }
+  .result-msg.win { color:var(--gold-light); text-shadow:var(--text-glow); border:1px solid rgba(201,168,76,.5); background:rgba(201,168,76,.08); }
+  .result-msg.jackpot { color:#fff; text-shadow:0 0 10px #fff,0 0 20px var(--gold-light),0 0 40px var(--gold),0 0 80px var(--gold); border:1px solid var(--gold-light); background:rgba(201,168,76,.15); animation:jackpotPulse .5s ease-in-out infinite alternate; }
+  @keyframes jackpotPulse { from{box-shadow:0 0 10px rgba(201,168,76,.3)} to{box-shadow:0 0 30px rgba(201,168,76,.8),0 0 60px rgba(201,168,76,.4)} }
+  .result-msg.lose { color:rgba(201,168,76,.4); font-size:11px; }
+  .spin-btn { font-family:'Cinzel Decorative',serif; font-size:18px; font-weight:700; letter-spacing:4px; color:var(--bg); background:linear-gradient(160deg,var(--gold-light) 0%,var(--gold) 40%,var(--gold-dark) 100%); border:none; padding:14px 60px; cursor:pointer; clip-path:polygon(12px 0%,calc(100% - 12px) 0%,100% 50%,calc(100% - 12px) 100%,12px 100%,0% 50%); text-transform:uppercase; transition:all .15s; box-shadow:0 4px 20px rgba(201,168,76,.4); }
+  .spin-btn:hover:not(:disabled) { background:linear-gradient(160deg,#fff8d0 0%,var(--gold-light) 40%,var(--gold) 100%); transform:translateY(-2px); box-shadow:0 8px 30px rgba(201,168,76,.6); }
+  .spin-btn:active:not(:disabled) { transform:translateY(1px); }
+  .spin-btn:disabled { opacity:.5; cursor:not-allowed; }
+  .roll-info { display:flex; gap:30px; font-size:10px; letter-spacing:3px; color:rgba(201,168,76,.5); text-transform:uppercase; }
+  .roll-info span { color:var(--gold); font-weight:600; }
+  .combos { width:100%; border-top:1px solid rgba(201,168,76,.2); padding-top:12px; display:grid; grid-template-columns:1fr 1fr; gap:3px 20px; font-size:9px; letter-spacing:2px; color:rgba(201,168,76,.4); text-transform:uppercase; }
+  .combos .combo-title { grid-column:1/-1; text-align:center; color:rgba(201,168,76,.6); margin-bottom:4px; font-size:8px; letter-spacing:4px; }
+  .combos .combo-item { display:flex; gap:6px; }
+  .combos .combo-item .sym { color:var(--gold); }
+  #jackpot-overlay { position:fixed; inset:0; background:radial-gradient(ellipse at center,rgba(201,168,76,.3) 0%,transparent 70%); pointer-events:none; opacity:0; z-index:100; }
+  #jackpot-overlay.active { animation:overlayFlash .4s ease-in-out 3; }
+  @keyframes overlayFlash { 0%,100%{opacity:0} 50%{opacity:1} }
+  .win-highlight { position:absolute; inset:0; border:3px solid var(--gold-light); box-shadow:0 0 20px var(--gold),inset 0 0 20px rgba(201,168,76,.2); pointer-events:none; opacity:0; z-index:10; transition:opacity .3s; }
+  .reels-frame.winning .win-highlight { opacity:1; }
+  .insta-badge { position:absolute; top:-12px; right:-12px; width:40px; height:40px; background:radial-gradient(circle,var(--gold-light),var(--gold)); border:2px solid var(--gold-light); border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:7px; font-family:'Cinzel Decorative',serif; color:var(--bg); font-weight:900; text-align:center; line-height:1.1; box-shadow:0 0 15px var(--gold); transform:scale(0); transition:transform .3s cubic-bezier(.34,1.56,.64,1); z-index:20; pointer-events:none; text-transform:uppercase; }
+  .insta-badge.ready { transform:scale(1); animation:badgePulse 1s ease-in-out infinite alternate; }
+  @keyframes badgePulse { from{box-shadow:0 0 10px var(--gold);transform:scale(1)} to{box-shadow:0 0 25px var(--gold),0 0 40px rgba(201,168,76,.5);transform:scale(1.1)} }
+</style>
+</head>
+<body>
+<div class="corner corner-tl"><svg viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M10 10 L50 10 Q60 10 60 20 L60 30 Q60 40 70 40 L110 40" stroke="#c9a84c" stroke-width="2" fill="none"/><path d="M10 10 L10 50 Q10 60 20 60 L30 60 Q40 60 40 70 L40 110" stroke="#c9a84c" stroke-width="2" fill="none"/><circle cx="10" cy="10" r="4" fill="#c9a84c"/><circle cx="60" cy="25" r="3" fill="none" stroke="#c9a84c" stroke-width="1.5"/><circle cx="25" cy="60" r="3" fill="none" stroke="#c9a84c" stroke-width="1.5"/></svg></div>
+<div class="corner corner-tr"><svg viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M10 10 L50 10 Q60 10 60 20 L60 30 Q60 40 70 40 L110 40" stroke="#c9a84c" stroke-width="2" fill="none"/><path d="M10 10 L10 50 Q10 60 20 60 L30 60 Q40 60 40 70 L40 110" stroke="#c9a84c" stroke-width="2" fill="none"/><circle cx="10" cy="10" r="4" fill="#c9a84c"/></svg></div>
+<div class="corner corner-bl"><svg viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M10 10 L50 10 Q60 10 60 20 L60 30 Q60 40 70 40 L110 40" stroke="#c9a84c" stroke-width="2" fill="none"/><path d="M10 10 L10 50 Q10 60 20 60 L30 60 Q40 60 40 70 L40 110" stroke="#c9a84c" stroke-width="2" fill="none"/><circle cx="10" cy="10" r="4" fill="#c9a84c"/></svg></div>
+<div class="corner corner-br"><svg viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M10 10 L50 10 Q60 10 60 20 L60 30 Q60 40 70 40 L110 40" stroke="#c9a84c" stroke-width="2" fill="none"/><path d="M10 10 L10 50 Q10 60 20 60 L30 60 Q40 60 40 70 L40 110" stroke="#c9a84c" stroke-width="2" fill="none"/><circle cx="10" cy="10" r="4" fill="#c9a84c"/></svg></div>
+<div id="jackpot-overlay"></div>
+<div class="machine">
+  <div class="title">EVERY1<span>Slots</span></div>
+  <div class="jackpot-bar-wrap">
+    <div class="jackpot-label">Insta-Jackpot Meter</div>
+    <div class="jackpot-track"><div class="jackpot-fill" id="jackpot-fill"></div></div>
+    <div class="jackpot-ticks"><span>0</span><span>2</span><span>4</span><span>6</span><span>8</span><span>10</span></div>
+  </div>
+  <div class="reels-frame" id="reels-frame">
+    <div class="win-highlight"></div>
+    <div class="reels" id="reels">
+      <div class="reel" id="reel-0"><div class="reel-inner" id="reel-inner-0"></div></div>
+      <div class="reel" id="reel-1"><div class="reel-inner" id="reel-inner-1"></div></div>
+      <div class="reel" id="reel-2"><div class="reel-inner" id="reel-inner-2"></div></div>
+    </div>
+    <div class="insta-badge" id="insta-badge">NEXT<br>SPIN!</div>
+  </div>
+  <div class="result-area"><div class="result-msg show lose" id="result-msg">— Your fate awaits —</div></div>
+  <div class="controls" style="display:flex;flex-direction:column;align-items:center;gap:12px;width:100%">
+    <button class="spin-btn" id="spin-btn" onclick="spin()">SPIN</button>
+    <div class="roll-info">Rolls: <span id="roll-count">0</span> &nbsp;|&nbsp; Until Insta-Jackpot: <span id="rolls-until">10</span></div>
+  </div>
+  <div class="combos">
+    <div class="combo-title">— Winning Combinations —</div>
+    <div class="combo-item"><span class="sym">J+J+J</span><span>Jackpot</span></div>
+    <div class="combo-item"><span class="sym">Q+Q+Q</span><span>Jackpot</span></div>
+    <div class="combo-item"><span class="sym">K+K+K</span><span>Jackpot</span></div>
+    <div class="combo-item"><span class="sym">A+A+A</span><span>Jackpot</span></div>
+    <div class="combo-item"><span class="sym">D+D+D</span><span>Jackpot</span></div>
+    <div class="combo-item"><span class="sym">X+J+J</span><span>Win</span></div>
+    <div class="combo-item"><span class="sym">X+Q+Q</span><span>Win</span></div>
+    <div class="combo-item"><span class="sym">X+K+K</span><span>Win</span></div>
+    <div class="combo-item"><span class="sym">X+A+A</span><span>Win</span></div>
+    <div class="combo-item"><span class="sym">X+X+D</span><span>Win</span></div>
+    <div class="combo-item"><span class="sym">X+D+D</span><span>Win</span></div>
+    <div class="combo-item"><span class="sym">X+X+X</span><span>Win</span></div>
+  </div>
+</div>
+<script>
+const IMAGES = {
+  J: "jack.png",
+  Q: "queen.png",
+  K: "king.png",
+  A: "ace.png",
+  D: "death.png",
+};
+  const WEIGHTS = {
+  J: 7,
+  Q: 6,
+  K: 5,
+  A: 4,
+  D: 3,
+};
+
+const SYMBOLS = Object.keys(WEIGHTS);
+
+function randSym() {
+  const totalWeight = Object.values(WEIGHTS).reduce((a,b) => a+b, 0);
+  let rand = Math.random() * totalWeight;
+
+  for (const sym of SYMBOLS) {
+    if (rand < WEIGHTS[sym]) {
+      return sym;
+    }
+    rand -= WEIGHTS[sym];
+  }
+}
+const CARD_H = 190;
+const STRIP_LEN = 30;
+let rollCount = 0, meterCount = 0, isSpinning = false;
+let reelStrips = [[],[],[]], finalSymbols = ['J','J','J'];
+
+function createReelDOM(reelIdx, strip) {
+  const inner = document.getElementById('reel-inner-'+reelIdx);
+  inner.innerHTML = '';
+  strip.forEach(sym => {
+    const cell = document.createElement('div');
+    cell.className = 'reel-cell';
+    const img = document.createElement('img');
+    img.src = IMAGES[sym]; img.alt = sym; img.draggable = false;
+    cell.appendChild(img); inner.appendChild(cell);
+  });
+}
+
+function setReelPosition(reelIdx, pos) {
+  document.getElementById('reel-inner-'+reelIdx).style.transform = `translateY(${-pos*CARD_H}px)`;
+}
+
+function initReels() {
+  for (let i=0;i<3;i++) {
+    reelStrips[i] = Array.from({length:STRIP_LEN},randSym);
+    createReelDOM(i, reelStrips[i]);
+    setReelPosition(i, 0);
+  }
+}
+
+function getWinType(syms) {
+  const counts = {};
+  syms.forEach(s => counts[s]=(counts[s]||0)+1);
+  if (new Set(syms).size===1) return 'jackpot';
+  const dCount = counts['D']||0;
+  const nonD = syms.filter(s=>s!=='D');
+  for (const sym of ['J','Q','K','A']) {
+    if (counts[sym]===2) return 'win';
+  }
+  if (dCount===1 && new Set(nonD).size===2) return 'win';
+  if (dCount===2) return 'win';
+  if (new Set(syms).size===3 && dCount===0) return 'win';
+  return 'lose';
+}
+
+function getWinMessage(syms, winType) {
+  if (winType==='jackpot') {
+    const names={J:'The Jack',Q:'The Queen',K:'The King',A:'The Ace',D:'Death'};
+    return `✦ JACKPOT — ${names[syms[0]]} ✦`;
+  }
+  if (winType==='win') return '✧ Your destiny shines ✧';
+  const t=['— The stars were not aligned —','— Fate is a cruel mistress —','— The arrow has missed —','— Try again, mortal —'];
+  return t[Math.floor(Math.random()*t.length)];
+}
+
+function showResult(msg, type) {
+  const el = document.getElementById('result-msg');
+  el.className = 'result-msg'; void el.offsetWidth;
+  el.textContent = msg; el.className = 'result-msg show '+type;
+}
+
+function updateMeter() {
+  document.getElementById('jackpot-fill').style.width = (meterCount/10*100)+'%';
+  document.getElementById('rolls-until').textContent = Math.max(0,10-meterCount);
+  const badge = document.getElementById('insta-badge');
+  meterCount>=10 ? badge.classList.add('ready') : badge.classList.remove('ready');
+}
+
+async function spin() {
+  if (isSpinning) return;
+  isSpinning = true;
+  document.getElementById('spin-btn').disabled = true;
+  document.getElementById('reels-frame').classList.remove('winning');
+  document.getElementById('result-msg').classList.remove('show');
+  rollCount++; meterCount++;
+  document.getElementById('roll-count').textContent = rollCount;
+
+  const forceJackpot = meterCount>=10;
+  let chosen;
+  if (forceJackpot) { const s=randSym(); chosen=[s,s,s]; }
+  else { chosen=[randSym(),randSym(),randSym()]; }
+  finalSymbols = chosen;
+
+  for (let i=0;i<3;i++) {
+    const strip = Array.from({length:STRIP_LEN-1},randSym);
+    strip.push(chosen[i]);
+    reelStrips[i] = strip;
+    createReelDOM(i, strip);
+    setReelPosition(i,0);
+  }
+
+  const spinDurations = [1200,1500,1800];
+  await new Promise(resolve => {
+    let frame=0; const positions=[0,0,0]; const stopped=[false,false,false];
+    function tick() {
+      frame++;
+      for (let i=0;i<3;i++) {
+        if (stopped[i]) continue;
+        positions[i] += 0.25;
+        if (positions[i]>=STRIP_LEN-1) positions[i]=STRIP_LEN-1;
+        if (frame*(1000/60)>=spinDurations[i]) { positions[i]=STRIP_LEN-1; stopped[i]=true; }
+        setReelPosition(i,positions[i]);
+      }
+      stopped.every(Boolean) ? resolve() : requestAnimationFrame(tick);
+    }
+    requestAnimationFrame(tick);
+  });
+
+  const winType = getWinType(chosen);
+  const msg = getWinMessage(chosen, winType);
+  if (winType==='jackpot'||winType==='win') document.getElementById('reels-frame').classList.add('winning');
+  if (winType==='jackpot') {
+    const ov=document.getElementById('jackpot-overlay');
+    ov.classList.add('active');
+    setTimeout(()=>ov.classList.remove('active'),1300);
+    meterCount=0;
+  }
+  if (forceJackpot) meterCount=0;
+  updateMeter();
+
+  setTimeout(()=>{
+    showResult(msg,winType);
+    isSpinning=false;
+    document.getElementById('spin-btn').disabled=false;
+  },200);
+}
+
+initReels(); updateMeter();
+</script>
+</body>
+</html>
