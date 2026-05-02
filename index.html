@@ -6,11 +6,18 @@
 <title>EVERY1 SLOTS</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700;900&family=Cinzel:wght@400;600;900&display=swap');
-  :root {
-    --gold: #c9a84c; --gold-light: #f0d080; --gold-dark: #7a5c1e;
-    --purple: #4a1a6e; --purple-dark: #1e0a30; --bg: #0d0410;
-    --text-glow: 0 0 10px #c9a84c, 0 0 20px #c9a84c, 0 0 40px #c9a84c88;
-    --card-w: 120px; --card-h: 190px;
+ :root {
+  --gold: #c9a84c;
+  --gold-light: #f0d080;
+  --gold-dark: #7a5c1e;
+
+  --green: #0f3d2e;
+  --green-dark: #071f17;
+  --bg: #06140f;
+
+  --text-glow: 0 0 10px #c9a84c, 0 0 20px #c9a84c, 0 0 40px #c9a84c88;
+  --card-w: 120px;
+  --card-h: 190px;
   }
   * { margin:0; padding:0; box-sizing:border-box; }
   body {
@@ -19,7 +26,7 @@
   }
   body::before {
     content:''; position:fixed; inset:0;
-    background-image: repeating-linear-gradient(45deg,transparent,transparent 30px,rgba(74,26,110,.15) 30px,rgba(74,26,110,.15) 60px), repeating-linear-gradient(-45deg,transparent,transparent 30px,rgba(201,168,76,.06) 30px,rgba(201,168,76,.06) 60px);
+    background-image: repeating-linear-gradient(45deg,transparent,transparent 30px,rgba(15,61,46,.25) 30px,rgba(74,26,110,.15) 60px), repeating-linear-gradient(-45deg,transparent,transparent 30px,rgba(201,168,76,.06) 30px,rgba(201,168,76,.06) 60px);
     animation: bgShift 20s linear infinite; pointer-events:none;
   }
   @keyframes bgShift { from{background-position:0 0,0 0} to{background-position:120px 120px,-120px 120px} }
@@ -29,9 +36,9 @@
   .machine {
     position:relative; display:flex; flex-direction:column; align-items:center; gap:16px;
     padding:28px 36px 24px;
-    background:linear-gradient(160deg,#1a0828 0%,#0d0410 40%,#1a0828 100%);
+    background:linear-gradient(160deg,var(--green) 0%,var(--bg) 40%,var(--green) 100%);
     border:3px solid var(--gold);
-    box-shadow:0 0 0 1px var(--gold-dark),0 0 30px rgba(201,168,76,.3),inset 0 0 60px rgba(74,26,110,.4),0 20px 60px rgba(0,0,0,.8);
+    box-shadow:0 0 0 1px var(--gold-dark),0 0 30px rgba(201,168,76,.3),inset 0 0 60px rgba(15,61,46,.4),0 20px 60px rgba(0,0,0,.8);
     border-radius:4px; z-index:1; min-width:460px;
   }
   .machine::before { content:''; position:absolute; inset:6px; border:1px solid rgba(201,168,76,.3); pointer-events:none; border-radius:2px; }
